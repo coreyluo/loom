@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bazinga.loom.dao.TradeAccountDAO">
+
+    <resultMap id="BaseResultMap" type="com.bazinga.loom.model.TradeAccount">
+        <id column="id" jdbcType="BIGINT"  property="id" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="investor_id" jdbcType="VARCHAR" property="investorId"/>
+        <result column="trade_password" jdbcType="VARCHAR" property="tradePassword"/>
+        <result column="server_ip" jdbcType="VARCHAR" property="serverIp"/>
+        <result column="hd_serial" jdbcType="VARCHAR" property="hdSerial"/>
+        <result column="order_ref" jdbcType="BIGINT" property="orderRef"/>
+        <result column="position" jdbcType="DECIMAL" property="position"/>
+        <result column="sz_gd_code" jdbcType="VARCHAR" property="szGdCode"/>
+        <result column="sh_gd_code" jdbcType="VARCHAR" property="shGdCode"/>
+        <result column="account_status" jdbcType="INTEGER" property="accountStatus"/>
+        <result column="insert_times" jdbcType="INTEGER" property="insertTimes"/>
+        <result column="max_order_no" jdbcType="INTEGER" property="maxOrderNo"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id,
+            user_id,
+            investor_id,
+            trade_password,
+            server_ip,
+            hd_serial,
+            order_ref,
+            position,
+            sz_gd_code,
+            sh_gd_code,
+            account_status,
+            insert_times,
+            max_order_no,
+            create_time,
+            update_time
+        </sql>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from trade_account
+        where id = #{id}
+    </select>
+
+
+    <insert id="insert" parameterType="com.bazinga.loom.model.TradeAccount" useGeneratedKeys="true" keyProperty="id">
+        insert into trade_account (<include refid="Base_Column_List" />)
+        values(
+        #{id, jdbcType=BIGINT},
+            #{userId, jdbcType=VARCHAR},
+            #{investorId, jdbcType=VARCHAR},
+            #{tradePassword, jdbcType=VARCHAR},
+            #{serverIp, jdbcType=VARCHAR},
+            #{hdSerial, jdbcType=VARCHAR},
+            #{orderRef, jdbcType=BIGINT},
+            #{position, jdbcType=DECIMAL},
+            #{szGdCode, jdbcType=VARCHAR},
+            #{shGdCode, jdbcType=VARCHAR},
+            #{accountStatus, jdbcType=INTEGER},
+            #{insertTimes, jdbcType=INTEGER},
+            #{maxOrderNo, jdbcType=INTEGER},
+            #{createTime, jdbcType=TIMESTAMP},
+            #{updateTime, jdbcType=TIMESTAMP}
+            )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.bazinga.loom.model.TradeAccount">
+        update trade_account
+        <set>
+            <if test="userId != null">
+                user_id = #{userId, jdbcType=VARCHAR},
+            </if>
+            <if test="investorId != null">
+                investor_id = #{investorId, jdbcType=VARCHAR},
+            </if>
+            <if test="tradePassword != null">
+                trade_password = #{tradePassword, jdbcType=VARCHAR},
+            </if>
+            <if test="serverIp != null">
+                server_ip = #{serverIp, jdbcType=VARCHAR},
+            </if>
+            <if test="hdSerial != null">
+                hd_serial = #{hdSerial, jdbcType=VARCHAR},
+            </if>
+            <if test="orderRef != null">
+                order_ref = #{orderRef, jdbcType=BIGINT},
+            </if>
+            <if test="position != null">
+                position = #{position, jdbcType=DECIMAL},
+            </if>
+            <if test="szGdCode != null">
+                sz_gd_code = #{szGdCode, jdbcType=VARCHAR},
+            </if>
+            <if test="shGdCode != null">
+                sh_gd_code = #{shGdCode, jdbcType=VARCHAR},
+            </if>
+            <if test="accountStatus != null">
+                account_status = #{accountStatus, jdbcType=INTEGER},
+            </if>
+            <if test="insertTimes != null">
+                insert_times = #{insertTimes, jdbcType=INTEGER},
+            </if>
+            <if test="maxOrderNo != null">
+                max_order_no = #{maxOrderNo, jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime, jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id} limit 1
+    </update>
+
+    <sql id="Equal_Where_List">
+        <if test="userId != null">
+            and user_id = #{userId, jdbcType=VARCHAR}
+        </if>
+        <if test="investorId != null">
+            and investor_id = #{investorId, jdbcType=VARCHAR}
+        </if>
+        <if test="tradePassword != null">
+            and trade_password = #{tradePassword, jdbcType=VARCHAR}
+        </if>
+        <if test="serverIp != null">
+            and server_ip = #{serverIp, jdbcType=VARCHAR}
+        </if>
+        <if test="hdSerial != null">
+            and hd_serial = #{hdSerial, jdbcType=VARCHAR}
+        </if>
+        <if test="orderRef != null">
+            and order_ref = #{orderRef, jdbcType=BIGINT}
+        </if>
+        <if test="position != null">
+            and position = #{position, jdbcType=DECIMAL}
+        </if>
+        <if test="szGdCode != null">
+            and sz_gd_code = #{szGdCode, jdbcType=VARCHAR}
+        </if>
+        <if test="shGdCode != null">
+            and sh_gd_code = #{shGdCode, jdbcType=VARCHAR}
+        </if>
+        <if test="accountStatus != null">
+            and account_status = #{accountStatus, jdbcType=INTEGER}
+        </if>
+        <if test="insertTimes != null">
+            and insert_times = #{insertTimes, jdbcType=INTEGER}
+        </if>
+        <if test="maxOrderNo != null">
+            and max_order_no = #{maxOrderNo, jdbcType=INTEGER}
+        </if>
+    </sql>
+
+    <sql id="Range_Where_List">
+        <if test="createTimeFrom != null">
+            <![CDATA[
+            and create_time >= #{createTimeFrom, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        <if test="createTimeTo != null">
+            <![CDATA[
+            and create_time <= #{createTimeTo, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        <if test="updateTimeFrom != null">
+            <![CDATA[
+            and update_time >= #{updateTimeFrom, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        <if test="updateTimeTo != null">
+            <![CDATA[
+            and update_time <= #{updateTimeTo, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+    </sql>
+
+    <sql id="GtLastMaxId_Where">
+        <if test="lastMaxId != null and lastMaxId > 0">
+            and id > #{lastMaxId}
+        </if>
+    </sql>
+
+    <sql id="Order_By">
+        <if test="sorts != null and sorts.size > 0">
+            ORDER BY
+            <foreach collection="sorts" item="sortItem" separator=",">
+                ${sortItem.column} ${sortItem.type.message}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="selectByCondition" parameterType="com.bazinga.loom.query.TradeAccountQuery" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from trade_account
+        <where>
+            <include refid="Equal_Where_List"/>
+            <include refid="Range_Where_List"/>
+            <include refid="GtLastMaxId_Where" />
+        </where>
+        <include refid="Order_By"/>
+        <if test="limit > 0">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="countByCondition" parameterType="com.bazinga.loom.query.TradeAccountQuery" resultType="java.lang.Integer">
+        select count(1)
+        from trade_account
+        <where>
+            <include refid="Equal_Where_List"/>
+            <include refid="Range_Where_List"/>
+        </where>
+    </select>
+
+
+</mapper>
