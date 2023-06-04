@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bazinga.loom.dao.QuoteIpConfigDAO">
+
+    <resultMap id="BaseResultMap" type="com.bazinga.loom.model.QuoteIpConfig">
+        <id column="id" jdbcType="BIGINT"  property="id" />
+        <result column="server_ip" jdbcType="VARCHAR" property="serverIp"/>
+        <result column="quote_type" jdbcType="TINYINT" property="quoteType"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id,
+            server_ip,
+            quote_type,
+            create_time
+        </sql>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from quote_ip_config
+        where id = #{id}
+    </select>
+
+
+    <insert id="insert" parameterType="com.bazinga.loom.model.QuoteIpConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into quote_ip_config (<include refid="Base_Column_List" />)
+        values(
+        #{id, jdbcType=BIGINT},
+            #{serverIp, jdbcType=VARCHAR},
+            #{quoteType, jdbcType=TINYINT},
+            #{createTime, jdbcType=TIMESTAMP}
+            )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.bazinga.loom.model.QuoteIpConfig">
+        update quote_ip_config
+        <set>
+            <if test="serverIp != null">
+                server_ip = #{serverIp, jdbcType=VARCHAR},
+            </if>
+            <if test="quoteType != null">
+                quote_type = #{quoteType, jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime, jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id} limit 1
+    </update>
+
+    <sql id="Equal_Where_List">
+        <if test="serverIp != null">
+            and server_ip = #{serverIp, jdbcType=VARCHAR}
+        </if>
+        <if test="quoteType != null">
+            and quote_type = #{quoteType, jdbcType=TINYINT}
+        </if>
+    </sql>
+
+    <sql id="Range_Where_List">
+        <if test="createTimeFrom != null">
+            <![CDATA[
+            and create_time >= #{createTimeFrom, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        <if test="createTimeTo != null">
+            <![CDATA[
+            and create_time <= #{createTimeTo, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+    </sql>
+
+    <sql id="GtLastMaxId_Where">
+        <if test="lastMaxId != null and lastMaxId > 0">
+            and id > #{lastMaxId}
+        </if>
+    </sql>
+
+    <sql id="Order_By">
+        <if test="sorts != null and sorts.size > 0">
+            ORDER BY
+            <foreach collection="sorts" item="sortItem" separator=",">
+                ${sortItem.column} ${sortItem.type.message}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="selectByCondition" parameterType="com.bazinga.loom.query.QuoteIpConfigQuery" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from quote_ip_config
+        <where>
+            <include refid="Equal_Where_List"/>
+            <include refid="Range_Where_List"/>
+            <include refid="GtLastMaxId_Where" />
+        </where>
+        <include refid="Order_By"/>
+        <if test="limit > 0">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="countByCondition" parameterType="com.bazinga.loom.query.QuoteIpConfigQuery" resultType="java.lang.Integer">
+        select count(1)
+        from quote_ip_config
+        <where>
+            <include refid="Equal_Where_List"/>
+            <include refid="Range_Where_List"/>
+        </where>
+    </select>
+
+
+</mapper>
