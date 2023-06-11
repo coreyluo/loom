@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bazinga.loom.dao.StockCloseSnapshotDAO">
+
+    <resultMap id="BaseResultMap" type="com.bazinga.loom.model.StockCloseSnapshot">
+        <id column="id" jdbcType="BIGINT"  property="id" />
+        <result column="stock_code" jdbcType="VARCHAR" property="stockCode"/>
+        <result column="kbar_date" jdbcType="VARCHAR" property="kbarDate"/>
+        <result column="unique_key" jdbcType="VARCHAR" property="uniqueKey"/>
+        <result column="stock_name" jdbcType="VARCHAR" property="stockName"/>
+        <result column="bid1_price" jdbcType="DECIMAL" property="bid1Price"/>
+        <result column="bid2_price" jdbcType="DECIMAL" property="bid2Price"/>
+        <result column="bid1_volume" jdbcType="BIGINT" property="bid1Volume"/>
+        <result column="bid2_volume" jdbcType="BIGINT" property="bid2Volume"/>
+        <result column="ask1_price" jdbcType="DECIMAL" property="ask1Price"/>
+        <result column="ask2_price" jdbcType="DECIMAL" property="ask2Price"/>
+        <result column="ask1_volume" jdbcType="BIGINT" property="ask1Volume"/>
+        <result column="ask2_volume" jdbcType="BIGINT" property="ask2Volume"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id,
+            stock_code,
+            kbar_date,
+            unique_key,
+            stock_name,
+            bid1_price,
+            bid2_price,
+            bid1_volume,
+            bid2_volume,
+            ask1_price,
+            ask2_price,
+            ask1_volume,
+            ask2_volume,
+            create_time,
+            update_time
+        </sql>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from stock_close_snapshot
+        where id = #{id}
+    </select>
+
+
+    <select id="selectByUniqueKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from stock_close_snapshot
+        where unique_key = #{uniqueKey} limit 1
+    </select>
+
+    <update id="updateByUniqueKey" parameterType="com.bazinga.loom.model.StockCloseSnapshot">
+        update stock_close_snapshot
+        <set>
+        <if test="stockCode != null">
+            stock_code = #{stockCode, jdbcType=VARCHAR},
+        </if>
+        <if test="kbarDate != null">
+            kbar_date = #{kbarDate, jdbcType=VARCHAR},
+        </if>
+        <if test="stockName != null">
+            stock_name = #{stockName, jdbcType=VARCHAR},
+        </if>
+        <if test="bid1Price != null">
+            bid1_price = #{bid1Price, jdbcType=DECIMAL},
+        </if>
+        <if test="bid2Price != null">
+            bid2_price = #{bid2Price, jdbcType=DECIMAL},
+        </if>
+        <if test="bid1Volume != null">
+            bid1_volume = #{bid1Volume, jdbcType=BIGINT},
+        </if>
+        <if test="bid2Volume != null">
+            bid2_volume = #{bid2Volume, jdbcType=BIGINT},
+        </if>
+        <if test="ask1Price != null">
+            ask1_price = #{ask1Price, jdbcType=DECIMAL},
+        </if>
+        <if test="ask2Price != null">
+            ask2_price = #{ask2Price, jdbcType=DECIMAL},
+        </if>
+        <if test="ask1Volume != null">
+            ask1_volume = #{ask1Volume, jdbcType=BIGINT},
+        </if>
+        <if test="ask2Volume != null">
+            ask2_volume = #{ask2Volume, jdbcType=BIGINT},
+        </if>
+        <if test="createTime != null">
+            create_time = #{createTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateTime != null">
+            update_time = #{updateTime, jdbcType=TIMESTAMP},
+        </if>
+        </set>
+        where unique_key = #{uniqueKey} limit 1
+    </update>
+    <insert id="insert" parameterType="com.bazinga.loom.model.StockCloseSnapshot" useGeneratedKeys="true" keyProperty="id">
+        insert into stock_close_snapshot (<include refid="Base_Column_List" />)
+        values(
+        #{id, jdbcType=BIGINT},
+            #{stockCode, jdbcType=VARCHAR},
+            #{kbarDate, jdbcType=VARCHAR},
+            #{uniqueKey, jdbcType=VARCHAR},
+            #{stockName, jdbcType=VARCHAR},
+            #{bid1Price, jdbcType=DECIMAL},
+            #{bid2Price, jdbcType=DECIMAL},
+            #{bid1Volume, jdbcType=BIGINT},
+            #{bid2Volume, jdbcType=BIGINT},
+            #{ask1Price, jdbcType=DECIMAL},
+            #{ask2Price, jdbcType=DECIMAL},
+            #{ask1Volume, jdbcType=BIGINT},
+            #{ask2Volume, jdbcType=BIGINT},
+            #{createTime, jdbcType=TIMESTAMP},
+            #{updateTime, jdbcType=TIMESTAMP}
+            )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.bazinga.loom.model.StockCloseSnapshot">
+        update stock_close_snapshot
+        <set>
+            <if test="stockCode != null">
+                stock_code = #{stockCode, jdbcType=VARCHAR},
+            </if>
+            <if test="kbarDate != null">
+                kbar_date = #{kbarDate, jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueKey != null">
+                unique_key = #{uniqueKey, jdbcType=VARCHAR},
+            </if>
+            <if test="stockName != null">
+                stock_name = #{stockName, jdbcType=VARCHAR},
+            </if>
+            <if test="bid1Price != null">
+                bid1_price = #{bid1Price, jdbcType=DECIMAL},
+            </if>
+            <if test="bid2Price != null">
+                bid2_price = #{bid2Price, jdbcType=DECIMAL},
+            </if>
+            <if test="bid1Volume != null">
+                bid1_volume = #{bid1Volume, jdbcType=BIGINT},
+            </if>
+            <if test="bid2Volume != null">
+                bid2_volume = #{bid2Volume, jdbcType=BIGINT},
+            </if>
+            <if test="ask1Price != null">
+                ask1_price = #{ask1Price, jdbcType=DECIMAL},
+            </if>
+            <if test="ask2Price != null">
+                ask2_price = #{ask2Price, jdbcType=DECIMAL},
+            </if>
+            <if test="ask1Volume != null">
+                ask1_volume = #{ask1Volume, jdbcType=BIGINT},
+            </if>
+            <if test="ask2Volume != null">
+                ask2_volume = #{ask2Volume, jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime, jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id} limit 1
+    </update>
+
+    <sql id="Equal_Where_List">
+        <if test="stockCode != null">
+            and stock_code = #{stockCode, jdbcType=VARCHAR}
+        </if>
+        <if test="kbarDate != null">
+            and kbar_date = #{kbarDate, jdbcType=VARCHAR}
+        </if>
+        <if test="uniqueKey != null">
+            and unique_key = #{uniqueKey, jdbcType=VARCHAR}
+        </if>
+        <if test="stockName != null">
+            and stock_name = #{stockName, jdbcType=VARCHAR}
+        </if>
+        <if test="bid1Price != null">
+            and bid1_price = #{bid1Price, jdbcType=DECIMAL}
+        </if>
+        <if test="bid2Price != null">
+            and bid2_price = #{bid2Price, jdbcType=DECIMAL}
+        </if>
+        <if test="bid1Volume != null">
+            and bid1_volume = #{bid1Volume, jdbcType=BIGINT}
+        </if>
+        <if test="bid2Volume != null">
+            and bid2_volume = #{bid2Volume, jdbcType=BIGINT}
+        </if>
+        <if test="ask1Price != null">
+            and ask1_price = #{ask1Price, jdbcType=DECIMAL}
+        </if>
+        <if test="ask2Price != null">
+            and ask2_price = #{ask2Price, jdbcType=DECIMAL}
+        </if>
+        <if test="ask1Volume != null">
+            and ask1_volume = #{ask1Volume, jdbcType=BIGINT}
+        </if>
+        <if test="ask2Volume != null">
+            and ask2_volume = #{ask2Volume, jdbcType=BIGINT}
+        </if>
+    </sql>
+
+    <sql id="Range_Where_List">
+        <if test="createTimeFrom != null">
+            <![CDATA[
+            and create_time >= #{createTimeFrom, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        <if test="createTimeTo != null">
+            <![CDATA[
+            and create_time <= #{createTimeTo, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        <if test="updateTimeFrom != null">
+            <![CDATA[
+            and update_time >= #{updateTimeFrom, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        <if test="updateTimeTo != null">
+            <![CDATA[
+            and update_time <= #{updateTimeTo, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+    </sql>
+
+    <sql id="GtLastMaxId_Where">
+        <if test="lastMaxId != null and lastMaxId > 0">
+            and id > #{lastMaxId}
+        </if>
+    </sql>
+
+    <sql id="Order_By">
+        <if test="sorts != null and sorts.size > 0">
+            ORDER BY
+            <foreach collection="sorts" item="sortItem" separator=",">
+                ${sortItem.column} ${sortItem.type.message}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="selectByCondition" parameterType="com.bazinga.loom.query.StockCloseSnapshotQuery" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from stock_close_snapshot
+        <where>
+            <include refid="Equal_Where_List"/>
+            <include refid="Range_Where_List"/>
+            <include refid="GtLastMaxId_Where" />
+        </where>
+        <include refid="Order_By"/>
+        <if test="limit > 0">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="countByCondition" parameterType="com.bazinga.loom.query.StockCloseSnapshotQuery" resultType="java.lang.Integer">
+        select count(1)
+        from stock_close_snapshot
+        <where>
+            <include refid="Equal_Where_List"/>
+            <include refid="Range_Where_List"/>
+        </where>
+    </select>
+
+
+</mapper>
