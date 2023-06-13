@@ -45,7 +45,24 @@ public class DateTimeUtils {
         calendar.set(Calendar.SECOND, 59);
         return calendar.getTime();
     }
-
+    public static String trans2CommonFormat(String originalQuoteTime ,boolean isL1Quote){
+        if(isL1Quote){
+            return  originalQuoteTime.replaceAll(":", "")+ "000";
+        }else {
+            if(originalQuoteTime.startsWith("9")){
+                originalQuoteTime = "0" + originalQuoteTime;
+            }
+            int suffixLength = 9-originalQuoteTime.length();
+            if(suffixLength == 1){
+                originalQuoteTime = originalQuoteTime +"0";
+            }else if(suffixLength ==2 ){
+                originalQuoteTime = originalQuoteTime +"00";
+            }else if(suffixLength == 3){
+                originalQuoteTime = originalQuoteTime +"000";
+            }
+            return originalQuoteTime;
+        }
+    }
     /**
      * 获取当天00:00:00秒的时间
      *

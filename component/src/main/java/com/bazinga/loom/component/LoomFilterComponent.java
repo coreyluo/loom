@@ -64,9 +64,6 @@ public class LoomFilterComponent {
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
             }
-
         }
-
-
     }
 }
