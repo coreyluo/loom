@@ -10,7 +10,7 @@ import java.util.List;
  * 〈功能详细描述〉
  *
  * @author
- * @date 2023-06-11
+ * @date 2023-06-13
  */
 public interface StockCloseSnapshotDAO {
 

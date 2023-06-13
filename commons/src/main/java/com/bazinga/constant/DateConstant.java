@@ -84,7 +84,7 @@ public class DateConstant {
     public static final Date PM_14_56_57;
     public static final Date PM_14_57_00;
     public static final Date PM_17_30_00;
-    public static final String TODAY_STRING;
+    public static String TODAY_STRING;
 
 
     static {

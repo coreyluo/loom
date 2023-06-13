@@ -10,12 +10,16 @@
         <result column="stock_name" jdbcType="VARCHAR" property="stockName"/>
         <result column="bid1_price" jdbcType="DECIMAL" property="bid1Price"/>
         <result column="bid2_price" jdbcType="DECIMAL" property="bid2Price"/>
+        <result column="bid3_price" jdbcType="DECIMAL" property="bid3Price"/>
         <result column="bid1_volume" jdbcType="BIGINT" property="bid1Volume"/>
         <result column="bid2_volume" jdbcType="BIGINT" property="bid2Volume"/>
+        <result column="bid3_volume" jdbcType="BIGINT" property="bid3Volume"/>
         <result column="ask1_price" jdbcType="DECIMAL" property="ask1Price"/>
         <result column="ask2_price" jdbcType="DECIMAL" property="ask2Price"/>
+        <result column="ask3_price" jdbcType="DECIMAL" property="ask3Price"/>
         <result column="ask1_volume" jdbcType="BIGINT" property="ask1Volume"/>
         <result column="ask2_volume" jdbcType="BIGINT" property="ask2Volume"/>
+        <result column="ask3_volume" jdbcType="BIGINT" property="ask3Volume"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
@@ -29,12 +33,16 @@
             stock_name,
             bid1_price,
             bid2_price,
+            bid3_price,
             bid1_volume,
             bid2_volume,
+            bid3_volume,
             ask1_price,
             ask2_price,
+            ask3_price,
             ask1_volume,
             ask2_volume,
+            ask3_volume,
             create_time,
             update_time
         </sql>
@@ -73,11 +81,17 @@
         <if test="bid2Price != null">
             bid2_price = #{bid2Price, jdbcType=DECIMAL},
         </if>
+        <if test="bid3Price != null">
+            bid3_price = #{bid3Price, jdbcType=DECIMAL},
+        </if>
         <if test="bid1Volume != null">
             bid1_volume = #{bid1Volume, jdbcType=BIGINT},
         </if>
         <if test="bid2Volume != null">
             bid2_volume = #{bid2Volume, jdbcType=BIGINT},
+        </if>
+        <if test="bid3Volume != null">
+            bid3_volume = #{bid3Volume, jdbcType=BIGINT},
         </if>
         <if test="ask1Price != null">
             ask1_price = #{ask1Price, jdbcType=DECIMAL},
@@ -85,11 +99,17 @@
         <if test="ask2Price != null">
             ask2_price = #{ask2Price, jdbcType=DECIMAL},
         </if>
+        <if test="ask3Price != null">
+            ask3_price = #{ask3Price, jdbcType=DECIMAL},
+        </if>
         <if test="ask1Volume != null">
             ask1_volume = #{ask1Volume, jdbcType=BIGINT},
         </if>
         <if test="ask2Volume != null">
             ask2_volume = #{ask2Volume, jdbcType=BIGINT},
+        </if>
+        <if test="ask3Volume != null">
+            ask3_volume = #{ask3Volume, jdbcType=BIGINT},
         </if>
         <if test="createTime != null">
             create_time = #{createTime, jdbcType=TIMESTAMP},
@@ -110,12 +130,16 @@
             #{stockName, jdbcType=VARCHAR},
             #{bid1Price, jdbcType=DECIMAL},
             #{bid2Price, jdbcType=DECIMAL},
+            #{bid3Price, jdbcType=DECIMAL},
             #{bid1Volume, jdbcType=BIGINT},
             #{bid2Volume, jdbcType=BIGINT},
+            #{bid3Volume, jdbcType=BIGINT},
             #{ask1Price, jdbcType=DECIMAL},
             #{ask2Price, jdbcType=DECIMAL},
+            #{ask3Price, jdbcType=DECIMAL},
             #{ask1Volume, jdbcType=BIGINT},
             #{ask2Volume, jdbcType=BIGINT},
+            #{ask3Volume, jdbcType=BIGINT},
             #{createTime, jdbcType=TIMESTAMP},
             #{updateTime, jdbcType=TIMESTAMP}
             )
@@ -142,11 +166,17 @@
             <if test="bid2Price != null">
                 bid2_price = #{bid2Price, jdbcType=DECIMAL},
             </if>
+            <if test="bid3Price != null">
+                bid3_price = #{bid3Price, jdbcType=DECIMAL},
+            </if>
             <if test="bid1Volume != null">
                 bid1_volume = #{bid1Volume, jdbcType=BIGINT},
             </if>
             <if test="bid2Volume != null">
                 bid2_volume = #{bid2Volume, jdbcType=BIGINT},
+            </if>
+            <if test="bid3Volume != null">
+                bid3_volume = #{bid3Volume, jdbcType=BIGINT},
             </if>
             <if test="ask1Price != null">
                 ask1_price = #{ask1Price, jdbcType=DECIMAL},
@@ -154,11 +184,17 @@
             <if test="ask2Price != null">
                 ask2_price = #{ask2Price, jdbcType=DECIMAL},
             </if>
+            <if test="ask3Price != null">
+                ask3_price = #{ask3Price, jdbcType=DECIMAL},
+            </if>
             <if test="ask1Volume != null">
                 ask1_volume = #{ask1Volume, jdbcType=BIGINT},
             </if>
             <if test="ask2Volume != null">
                 ask2_volume = #{ask2Volume, jdbcType=BIGINT},
+            </if>
+            <if test="ask3Volume != null">
+                ask3_volume = #{ask3Volume, jdbcType=BIGINT},
             </if>
             <if test="createTime != null">
                 create_time = #{createTime, jdbcType=TIMESTAMP},
@@ -189,11 +225,17 @@
         <if test="bid2Price != null">
             and bid2_price = #{bid2Price, jdbcType=DECIMAL}
         </if>
+        <if test="bid3Price != null">
+            and bid3_price = #{bid3Price, jdbcType=DECIMAL}
+        </if>
         <if test="bid1Volume != null">
             and bid1_volume = #{bid1Volume, jdbcType=BIGINT}
         </if>
         <if test="bid2Volume != null">
             and bid2_volume = #{bid2Volume, jdbcType=BIGINT}
+        </if>
+        <if test="bid3Volume != null">
+            and bid3_volume = #{bid3Volume, jdbcType=BIGINT}
         </if>
         <if test="ask1Price != null">
             and ask1_price = #{ask1Price, jdbcType=DECIMAL}
@@ -201,11 +243,17 @@
         <if test="ask2Price != null">
             and ask2_price = #{ask2Price, jdbcType=DECIMAL}
         </if>
+        <if test="ask3Price != null">
+            and ask3_price = #{ask3Price, jdbcType=DECIMAL}
+        </if>
         <if test="ask1Volume != null">
             and ask1_volume = #{ask1Volume, jdbcType=BIGINT}
         </if>
         <if test="ask2Volume != null">
             and ask2_volume = #{ask2Volume, jdbcType=BIGINT}
+        </if>
+        <if test="ask3Volume != null">
+            and ask3_volume = #{ask3Volume, jdbcType=BIGINT}
         </if>
     </sql>
 

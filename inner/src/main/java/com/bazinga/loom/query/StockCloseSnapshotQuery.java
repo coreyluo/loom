@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.math.BigDecimal;
 import java.math.BigDecimal;
 import java.math.BigDecimal;
+import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Date;
 
@@ -16,7 +18,7 @@ import java.io.Serializable;
  * 〈StockCloseSnapshot 查询参数〉<p>
  *
  * @author
- * @date 2023-06-11
+ * @date 2023-06-13
  */
 @lombok.Data
 @lombok.EqualsAndHashCode(callSuper = true)
@@ -56,6 +58,11 @@ public class StockCloseSnapshotQuery extends PagingQuery implements Serializable
     private BigDecimal bid2Price;
 
     /**
+     * 
+     */
+    private BigDecimal bid3Price;
+
+    /**
      * 买一量手数
      */
     private Long bid1Volume;
@@ -64,6 +71,11 @@ public class StockCloseSnapshotQuery extends PagingQuery implements Serializable
      * 买二量
      */
     private Long bid2Volume;
+
+    /**
+     * 
+     */
+    private Long bid3Volume;
 
     /**
      * 卖一价格
@@ -76,6 +88,11 @@ public class StockCloseSnapshotQuery extends PagingQuery implements Serializable
     private BigDecimal ask2Price;
 
     /**
+     * 
+     */
+    private BigDecimal ask3Price;
+
+    /**
      * 卖一量
      */
     private Long ask1Volume;
@@ -84,6 +101,11 @@ public class StockCloseSnapshotQuery extends PagingQuery implements Serializable
      * 卖二量
      */
     private Long ask2Volume;
+
+    /**
+     * 
+     */
+    private Long ask3Volume;
 
     /**
      * 创建时间 开始

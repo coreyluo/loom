@@ -18,7 +18,7 @@ import org.springframework.util.Assert;
   * 〈功能详细描述〉
   *
   * @author
-  * @date 2023-06-11
+  * @date 2023-06-13
   */
 @Repository
 public class StockCloseSnapshotDAOImpl extends SqlSessionDaoSupport implements StockCloseSnapshotDAO {

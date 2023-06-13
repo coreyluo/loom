@@ -14,18 +14,16 @@ public class InsertOrderEvent extends ApplicationEvent {
 
     private String quoteTime;
 
-    private Integer insertOrderType;
+    private Integer gearLevel;
 
-    private Integer insertModeType;
 
-    public InsertOrderEvent(Object source, String stockCode, BigDecimal orderPrice, Long cannonQuantity, String quoteTime, Integer insertOrderType, Integer insertModeType) {
+    public InsertOrderEvent(Object source, String stockCode, BigDecimal orderPrice, Long cannonQuantity, String quoteTime,Integer gearLevel) {
         super(source);
         this.stockCode = stockCode;
         this.orderPrice = orderPrice;
         this.cannonQuantity = cannonQuantity;
         this.quoteTime = quoteTime;
-        this.insertOrderType = insertOrderType;
-        this.insertModeType = insertModeType;
+        this.gearLevel = gearLevel;
     }
 
     public String getStockCode() {
@@ -60,19 +58,11 @@ public class InsertOrderEvent extends ApplicationEvent {
         this.quoteTime = quoteTime;
     }
 
-    public Integer getInsertOrderType() {
-        return insertOrderType;
+    public Integer getGearLevel() {
+        return gearLevel;
     }
 
-    public void setInsertOrderType(Integer insertOrderType) {
-        this.insertOrderType = insertOrderType;
-    }
-
-    public Integer getInsertModeType() {
-        return insertModeType;
-    }
-
-    public void setInsertModeType(Integer insertModeType) {
-        this.insertModeType = insertModeType;
+    public void setGearLevel(Integer gearLevel) {
+        this.gearLevel = gearLevel;
     }
 }

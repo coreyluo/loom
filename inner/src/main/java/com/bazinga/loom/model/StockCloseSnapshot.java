@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.BigDecimal;
 import java.math.BigDecimal;
 import java.math.BigDecimal;
+import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Date;
 
@@ -13,7 +15,7 @@ import java.io.Serializable;
  * 〈StockCloseSnapshot〉<p>
  *
  * @author
- * @date 2023-06-11
+ * @date 2023-06-13
  */
 @lombok.Data
 @lombok.ToString
@@ -84,6 +86,14 @@ public class StockCloseSnapshot implements Serializable {
     private BigDecimal bid2Price;
 
     /**
+     * 
+     *
+     * @允许为空   YES
+     * @是否索引   NO
+     */
+    private BigDecimal bid3Price;
+
+    /**
      * 买一量手数
      *
      * @允许为空   YES
@@ -98,6 +108,14 @@ public class StockCloseSnapshot implements Serializable {
      * @是否索引   NO
      */
     private Long bid2Volume;
+
+    /**
+     * 
+     *
+     * @允许为空   YES
+     * @是否索引   NO
+     */
+    private Long bid3Volume;
 
     /**
      * 卖一价格
@@ -116,6 +134,14 @@ public class StockCloseSnapshot implements Serializable {
     private BigDecimal ask2Price;
 
     /**
+     * 
+     *
+     * @允许为空   YES
+     * @是否索引   NO
+     */
+    private BigDecimal ask3Price;
+
+    /**
      * 卖一量
      *
      * @允许为空   YES
@@ -130,6 +156,14 @@ public class StockCloseSnapshot implements Serializable {
      * @是否索引   NO
      */
     private Long ask2Volume;
+
+    /**
+     * 
+     *
+     * @允许为空   YES
+     * @是否索引   NO
+     */
+    private Long ask3Volume;
 
     /**
      * 创建时间
