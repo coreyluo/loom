@@ -59,14 +59,11 @@ public class InsertOrderListener implements ApplicationListener<InsertOrderEvent
     public void onApplicationEvent(InsertOrderEvent insertOrderEvent) {
         String stockCode = insertOrderEvent.getStockCode();
         Long orderTimeStamp;
-        if(new Date().after(DateConstant.PM_14_56_00)){
-            log.info("接近下午收盘不下单 stockCode={}", insertOrderEvent.getStockCode());
-            return;
-        }
+
 
         synchronized (insertOrderEvent.getStockCode()) {
-            orderTimeStamp = InsertCacheManager.DUPLICATION_ORDER_MAP.get(insertOrderEvent.getStockCode());
-            InsertCacheManager.DUPLICATION_ORDER_MAP.put(insertOrderEvent.getStockCode(), System.currentTimeMillis());
+            orderTimeStamp = InsertCacheManager.DUPLICATION_ORDER_MAP.get(insertOrderEvent.getStockCode() + insertOrderEvent.getGearLevel());
+            InsertCacheManager.DUPLICATION_ORDER_MAP.put(insertOrderEvent.getStockCode()+ insertOrderEvent.getGearLevel(), System.currentTimeMillis());
         }
         addStock2System(stockCode);
         if (orderTimeStamp != null && System.currentTimeMillis() - orderTimeStamp < TimeUnit.SECONDS.toMillis(6)) {
@@ -78,9 +75,9 @@ public class InsertOrderListener implements ApplicationListener<InsertOrderEvent
             log.info("未构建出订单 stockCode{}", stockCode);
             return;
         }
-        addToDisableInsertPool(insertOrderEvent.getStockCode());
+        addToDisableInsertPool(insertOrderEvent.getStockCode()+ insertOrderEvent.getGearLevel());
         String shareHolderId = stockCode.startsWith("6")?InsertCacheManager.TRADE_ACCOUNT.getShGdCode():InsertCacheManager.TRADE_ACCOUNT.getSzGdCode();
-        synToCacheAndDb(stockCode,orderCancelPoolList);
+        synToCacheAndDb(stockCode,insertOrderEvent.getGearLevel(),orderCancelPoolList);
         for (int i = 0; i < orderCancelPoolList.size(); i++) {
             OrderCancelPool orderCancelPool = orderCancelPoolList.get(i);
             OrderRequestDTO orderRequestDTO = new OrderRequestDTO();
@@ -91,7 +88,11 @@ public class InsertOrderListener implements ApplicationListener<InsertOrderEvent
             orderRequestDTO.setLocalSign(orderCancelPool.getLocalSign());
             orderRequestDTO.setVolume(orderCancelPool.getOrderQuantity());
             try {
-                tradeApiComponent.insertOrder(orderRequestDTO);
+                if(insertOrderEvent.getGearLevel()>0){
+                    tradeApiComponent.insertOrder(orderRequestDTO);
+                }else {
+                    tradeApiComponent.sellOrder(orderRequestDTO);
+                }
             } catch (Exception e) {
                 log.error(e.getMessage()+"stockCode{} 下单异常",stockCode,e);
             }
@@ -111,13 +112,12 @@ public class InsertOrderListener implements ApplicationListener<InsertOrderEvent
 
 
 
-    private void synToCacheAndDb(String stockCode, List<OrderCancelPool> orderCancelPoolList) {
+    private void synToCacheAndDb(String stockCode, Integer gearLevel,List<OrderCancelPool> orderCancelPoolList) {
         for (OrderCancelPool orderCancelPool : orderCancelPoolList) {
             orderCancelPool.setLocalSign(InsertCacheManager.getOrderRef());
         }
-        InsertCacheManager.ORDER_CANCEL_POOL_MAP.put(stockCode,orderCancelPoolList);
-        InsertCacheManager.ORDER_CANCEL_POOL_TO_LOG_MAP.put(stockCode,orderCancelPoolList);
-
+        InsertCacheManager.ORDER_CANCEL_POOL_MAP.put(stockCode + gearLevel,orderCancelPoolList);
+        InsertCacheManager.ORDER_CANCEL_POOL_TO_LOG_MAP.put(stockCode + gearLevel,orderCancelPoolList);
 
     }
 
@@ -140,6 +140,7 @@ public class InsertOrderListener implements ApplicationListener<InsertOrderEvent
             OrderCancelPool orderCancelPool = new OrderCancelPool();
             orderCancelPool.setStockName("");
             orderCancelPool.setStockCode(insertOrderEvent.getStockCode());
+            orderCancelPool.setGearType(insertOrderEvent.getGearLevel());
             orderCancelPool.setOrderPrice(insertOrderEvent.getOrderPrice());
             orderCancelPool.setStatus(OrderCancelPoolStatusEnum.INIT.getCode());
             orderCancelPool.setOrderTimeMillis(System.currentTimeMillis());
@@ -187,16 +188,16 @@ public class InsertOrderListener implements ApplicationListener<InsertOrderEvent
         return true;
     }
 
-    private void addToDisableInsertPool(String stockCode) {
+    private void addToDisableInsertPool(String key) {
         DisableInsertStockDTO disableInsertStockDTO = new DisableInsertStockDTO();
-        disableInsertStockDTO.setStockCodeGear(stockCode);
+        disableInsertStockDTO.setStockCodeGear(key);
         disableInsertStockDTO.setOperateStatus(OperateStatusEnum.INSERT_ORDER.getCode());
-        log.info("设置 stockCode ={} 为已下单状态", stockCode);
-        CacheManager.DISABLE_INSERT_STOCK_POOL.put(stockCode, disableInsertStockDTO);
-        DisableInsertStockPool selectByStockCode = disableInsertStockPoolService.getByStockCodeGear(stockCode);
+        log.info("设置 stockCode ={} 为已下单状态", key);
+        CacheManager.DISABLE_INSERT_STOCK_POOL.put(key, disableInsertStockDTO);
+        DisableInsertStockPool selectByStockCode = disableInsertStockPoolService.getByStockCodeGear(key);
         if (selectByStockCode == null) {
             DisableInsertStockPool disableInsertStock = new DisableInsertStockPool();
-            disableInsertStock.setStockCodeGear(stockCode);
+            disableInsertStock.setStockCodeGear(key);
             disableInsertStock.setOperateStatus(OperateStatusEnum.INSERT_ORDER.getCode());
             SINGLE_THREAD_POOL.execute(() -> disableInsertStockPoolService.save(disableInsertStock));
         } else {

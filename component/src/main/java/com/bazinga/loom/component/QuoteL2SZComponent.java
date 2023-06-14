@@ -32,11 +32,15 @@ import java.util.stream.Collectors;
 public class QuoteL2SZComponent extends CTORATstpLev2MdSpi implements InitializingBean {
 
 
+    @Autowired
     private QuoteIpConfigService quoteIpConfigService;
 
 
     @Autowired
     private CirculateInfoService circulateInfoService;
+
+    @Autowired
+    private QuoteL2BusComponent quoteL2BusComponent;
 
 
     private CTORATstpLev2MdApi lev2Api;
@@ -185,7 +189,7 @@ public class QuoteL2SZComponent extends CTORATstpLev2MdSpi implements Initializi
         commonQuoteDTO.setLowestPrice(new BigDecimal(pMarketData.getLowestPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
         commonQuoteDTO.setHighestPrice(new BigDecimal(pMarketData.getHighestPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
 //            log.info("L2行情数据{}", JSONObject.toJSONString(commonQuoteDTO));
-
+        quoteL2BusComponent.dealWithQuote(commonQuoteDTO);
 
     }
 

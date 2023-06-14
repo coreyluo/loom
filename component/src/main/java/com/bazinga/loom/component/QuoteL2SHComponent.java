@@ -36,6 +36,8 @@ public class QuoteL2SHComponent extends CTORATstpLev2MdSpi implements Initializi
     @Autowired
     private CirculateInfoService circulateInfoService;
 
+    @Autowired
+    private QuoteL2BusComponent quoteL2BusComponent;
 
     private CTORATstpLev2MdApi lev2Api;
     private int requestId;
@@ -185,6 +187,8 @@ public class QuoteL2SHComponent extends CTORATstpLev2MdSpi implements Initializi
         commonQuoteDTO.setCurrentPrice(new BigDecimal(pMarketData.getLastPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
         commonQuoteDTO.setLowestPrice(new BigDecimal(pMarketData.getLowestPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
         commonQuoteDTO.setHighestPrice(new BigDecimal(pMarketData.getHighestPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+        quoteL2BusComponent.dealWithQuote(commonQuoteDTO);
+
 
     }
 

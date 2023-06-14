@@ -13,11 +13,11 @@
 
     <task:scheduler id="taskScheduler" pool-size="100" />
 
-   <!-- <task:scheduled-tasks scheduler="taskScheduler">
-        &lt;!&ndash; 每半分钟触发任务 &ndash;&gt;
-        <task:scheduled ref="testJob" method="test" cron="0/5 * * * * ?"/>
+    <task:scheduled-tasks scheduler="taskScheduler">
+        <!-- 每半分钟触发任务 -->
+        <task:scheduled ref="listenBestCodeJob" method="execute" initial-delay="10000" fixed-rate="25200000"/>
+        <task:scheduled ref="overNightJob" method="execute" cron="00 30 01 * * ?"/>
 
-
-    </task:scheduled-tasks>-->
+    </task:scheduled-tasks>
 
 </beans>

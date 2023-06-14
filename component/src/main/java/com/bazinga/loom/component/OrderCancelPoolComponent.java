@@ -6,6 +6,7 @@ import com.bazinga.enums.OperateStatusEnum;
 import com.bazinga.enums.OrderCancelPoolStatusEnum;
 import com.bazinga.loom.cache.CacheManager;
 import com.bazinga.loom.cache.InsertCacheManager;
+import com.bazinga.loom.dto.CancelOrderRequestDTO;
 import com.bazinga.loom.dto.DisableInsertStockDTO;
 import com.bazinga.loom.dto.ReturnOrderDTO;
 import com.bazinga.loom.model.DisableInsertStockPool;
@@ -13,6 +14,7 @@ import com.bazinga.loom.model.OrderCancelPool;
 import com.bazinga.loom.query.OrderCancelPoolQuery;
 import com.bazinga.loom.service.DisableInsertStockPoolService;
 import com.bazinga.loom.service.OrderCancelPoolService;
+import com.bazinga.loom.util.ExchangeIdUtil;
 import com.bazinga.util.DateTimeUtils;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,9 @@ public class OrderCancelPoolComponent {
     @Autowired
     private DisableInsertStockPoolService disableInsertStockPoolService;
 
+    @Autowired
+    private TradeApiComponent tradeApiComponent;
+
     public void change2SystemStatus(String stockCode){
         try {
             if(CacheManager.DISABLE_INSERT_STOCK_POOL.keySet().contains(stockCode)){
@@ -52,6 +57,37 @@ public class OrderCancelPoolComponent {
         }
 
     }
+
+    public void invokeCancel(List<OrderCancelPool> orderCancelPools){
+        List<CancelOrderRequestDTO> cancelOrderRequestDTOS = buildCancelOrderRequestDTOS(orderCancelPools);
+        for (CancelOrderRequestDTO cancelOrderRequestDTO : cancelOrderRequestDTOS) {
+          //  CancelCacheManager.cleanCancelMap(orderCancelDto.getStockCode());
+            tradeApiComponent.cancelOrder(cancelOrderRequestDTO);
+            log.info("触发撤单条件 stockCode ={}", cancelOrderRequestDTO.getStockCode());
+        }
+    }
+
+    public List<CancelOrderRequestDTO> buildCancelOrderRequestDTOS(List<OrderCancelPool> orderCancelPools){
+        List<CancelOrderRequestDTO>  list = new ArrayList<>(4);
+        OrderCancelPool first = orderCancelPools.get(0);
+        String stockCode = first.getStockCode();
+        int i = 0;
+        for (OrderCancelPool orderCancelPool:orderCancelPools) {
+            i++;
+            String localSign = InsertCacheManager.getOrderRef();
+            CancelOrderRequestDTO cancelOrderRequestDTO = new CancelOrderRequestDTO();
+            cancelOrderRequestDTO.setExchangeId(ExchangeIdUtil.getExchangeId(stockCode));
+            cancelOrderRequestDTO.setStockCode(stockCode);
+            cancelOrderRequestDTO.setOrderSysId(orderCancelPool.getOrderNo());
+            cancelOrderRequestDTO.setOrderRef(localSign);
+            cancelOrderRequestDTO.setOrderQuantity(orderCancelPool.getOrderQuantity());
+            list.add(cancelOrderRequestDTO);
+            /*cancelOrderLogComponent.saveInitCancelOrderLog(orderCancelDto.getStockCode(),orderCancelPool.getStockName(),orderCancelPool.getOrderNo(),localSign,
+                    cancelStrategyResult.getCancelStrategyCode(),cancelStrategyResult.getStrategyValue());*/
+        }
+        return list;
+    }
+
 
     public void updateData(ReturnOrderDTO returnOrderDTO){
 
@@ -75,7 +111,7 @@ public class OrderCancelPoolComponent {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(),e);
         }
 
 
