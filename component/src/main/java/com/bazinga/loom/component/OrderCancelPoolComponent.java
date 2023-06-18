@@ -90,8 +90,16 @@ public class OrderCancelPoolComponent {
 
 
     public void updateData(ReturnOrderDTO returnOrderDTO){
-
-        List<OrderCancelPool> orderCancelPoolList = InsertCacheManager.ORDER_CANCEL_POOL_MAP.get(returnOrderDTO.getStockCode());
+        List<OrderCancelPool> orderCancelPoolList = new ArrayList<>();
+        for (int i = -2; i < 3; i++) {
+            if(i==0){
+                continue;
+            }
+            List<OrderCancelPool> orderCancelPools = InsertCacheManager.ORDER_CANCEL_POOL_MAP.get(returnOrderDTO.getStockCode() + i);
+            if(!CollectionUtils.isEmpty(orderCancelPools)){
+                orderCancelPoolList.addAll(orderCancelPools);
+            }
+        }
         if(CollectionUtils.isEmpty(orderCancelPoolList)){
             log.info("未存缓存中找到委托单子 stockCode{}", returnOrderDTO.getStockCode());
             return;

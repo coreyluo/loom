@@ -133,11 +133,11 @@ public class InsertCacheManager implements InitializingBean {
                 orderCancelPoolTimes.add(key);
             }
 
-            if(OrderCancelPoolStatusEnum.INIT.getCode()==orderCancelPool.getStatus()||OrderCancelPoolStatusEnum.SUCCESS.getCode()==orderCancelPool.getStatus()){
+            if(OrderCancelPoolStatusEnum.INIT.getCode().equals(orderCancelPool.getStatus())||OrderCancelPoolStatusEnum.SUCCESS.getCode()==orderCancelPool.getStatus()){
                 List<OrderCancelPool> pools = ORDER_CANCEL_POOL_MAP.get(orderCancelPool.getStockCode());
                 if(CollectionUtils.isEmpty(pools)){
                     pools = Lists.newArrayList();
-                    ORDER_CANCEL_POOL_MAP.put(orderCancelPool.getStockCode(),pools);
+                    ORDER_CANCEL_POOL_MAP.put(orderCancelPool.getStockCode() + pools.get(0).getGearType(),pools);
                     ORDER_CANCEL_POOL_TO_LOG_MAP.put(orderCancelPool.getStockCode(),pools);
                 }
                 pools.add(orderCancelPool);

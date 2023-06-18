@@ -31,6 +31,9 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
     @Autowired
     private OrderCancelPoolComponent orderCancelPoolComponent;
 
+    @Autowired
+    private DealOrderInfoComponent dealOrderInfoComponent;
+
     static
     {
         System.loadLibrary("javatraderapi");
@@ -423,11 +426,10 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
     {
         log.info("已成交交易信息 stockCode：{} 订单编号：{}  成交方向：{} 成交编号：{}",pTrade.getSecurityID(),pTrade.getOrderSysID(),pTrade.getDirection(),pTrade.getTradeID());
         String direction = String.valueOf(pTrade.getDirection());
-        if(direction.equals("0")){
-            //买入已成交
-            log.info("已成交交易信息 买入 stockCode：{} 订单编号：{}  成交方向：{}",pTrade.getSecurityID(),pTrade.getOrderSysID(),pTrade.getDirection());
-           // dealOrderInfoComponent.dealOrderInsertPool(pTrade.getSecurityID(),pTrade.getOrderSysID());
-        }
+
+        log.info("已成交交易信息 买入 stockCode：{} 订单编号：{}  成交方向：{}",pTrade.getSecurityID(),pTrade.getOrderSysID(),pTrade.getDirection());
+        dealOrderInfoComponent.dealOrderInsertPool(pTrade.getSecurityID(),pTrade.getOrderSysID(),new BigDecimal(Double.valueOf(pTrade.getPrice()).toString()));
+
     }
 
     public void OnRspOrderAction(CTORATstpInputOrderActionField pInputOrderActionField, CTORATstpRspInfoField pRspInfo, int nRequestID)

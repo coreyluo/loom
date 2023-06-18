@@ -14,9 +14,11 @@ public class CommonQuoteDTO {
     private BigDecimal currentPrice;
     private BigDecimal buyOnePrice;
     private BigDecimal buyTwoPrice;
+    private BigDecimal buyThreePrice;
 
     private BigDecimal sellOnePrice;
     private BigDecimal sellTwoPrice;
+    private BigDecimal sellThreePrice;
 
     private Long buyOneQuantity;
     private Long buyTwoQuantity;

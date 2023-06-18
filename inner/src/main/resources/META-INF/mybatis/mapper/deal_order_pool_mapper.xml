@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bazinga.loom.dao.DealOrderPoolDAO">
+
+    <resultMap id="BaseResultMap" type="com.bazinga.loom.model.DealOrderPool">
+        <id column="id" jdbcType="BIGINT"  property="id" />
+        <result column="stock_code" jdbcType="VARCHAR" property="stockCode"/>
+        <result column="trade_price" jdbcType="DECIMAL" property="tradePrice"/>
+        <result column="gear_type" jdbcType="TINYINT" property="gearType"/>
+        <result column="stock_code_gear_type_day" jdbcType="VARCHAR" property="stockCodeGearTypeDay"/>
+        <result column="stock_name" jdbcType="VARCHAR" property="stockName"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id,
+            stock_code,
+            trade_price,
+            gear_type,
+            stock_code_gear_type_day,
+            stock_name,
+            create_time
+        </sql>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from deal_order_pool
+        where id = #{id}
+    </select>
+
+
+    <select id="selectByStockCodeGearTypeDay" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from deal_order_pool
+        where stock_code_gear_type_day = #{stockCodeGearTypeDay} limit 1
+    </select>
+
+    <update id="updateByStockCodeGearTypeDay" parameterType="com.bazinga.loom.model.DealOrderPool">
+        update deal_order_pool
+        <set>
+        <if test="stockCode != null">
+            stock_code = #{stockCode, jdbcType=VARCHAR},
+        </if>
+        <if test="tradePrice != null">
+            trade_price = #{tradePrice, jdbcType=DECIMAL},
+        </if>
+        <if test="gearType != null">
+            gear_type = #{gearType, jdbcType=TINYINT},
+        </if>
+        <if test="stockName != null">
+            stock_name = #{stockName, jdbcType=VARCHAR},
+        </if>
+        <if test="createTime != null">
+            create_time = #{createTime, jdbcType=TIMESTAMP},
+        </if>
+        </set>
+        where stock_code_gear_type_day = #{stockCodeGearTypeDay} limit 1
+    </update>
+    <insert id="insert" parameterType="com.bazinga.loom.model.DealOrderPool" useGeneratedKeys="true" keyProperty="id">
+        insert into deal_order_pool (<include refid="Base_Column_List" />)
+        values(
+        #{id, jdbcType=BIGINT},
+            #{stockCode, jdbcType=VARCHAR},
+            #{tradePrice, jdbcType=DECIMAL},
+            #{gearType, jdbcType=TINYINT},
+            #{stockCodeGearTypeDay, jdbcType=VARCHAR},
+            #{stockName, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP}
+            )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.bazinga.loom.model.DealOrderPool">
+        update deal_order_pool
+        <set>
+            <if test="stockCode != null">
+                stock_code = #{stockCode, jdbcType=VARCHAR},
+            </if>
+            <if test="tradePrice != null">
+                trade_price = #{tradePrice, jdbcType=DECIMAL},
+            </if>
+            <if test="gearType != null">
+                gear_type = #{gearType, jdbcType=TINYINT},
+            </if>
+            <if test="stockCodeGearTypeDay != null">
+                stock_code_gear_type_day = #{stockCodeGearTypeDay, jdbcType=VARCHAR},
+            </if>
+            <if test="stockName != null">
+                stock_name = #{stockName, jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime, jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id} limit 1
+    </update>
+
+    <sql id="Equal_Where_List">
+        <if test="stockCode != null">
+            and stock_code = #{stockCode, jdbcType=VARCHAR}
+        </if>
+        <if test="tradePrice != null">
+            and trade_price = #{tradePrice, jdbcType=DECIMAL}
+        </if>
+        <if test="gearType != null">
+            and gear_type = #{gearType, jdbcType=TINYINT}
+        </if>
+        <if test="stockCodeGearTypeDay != null">
+            and stock_code_gear_type_day = #{stockCodeGearTypeDay, jdbcType=VARCHAR}
+        </if>
+        <if test="stockName != null">
+            and stock_name = #{stockName, jdbcType=VARCHAR}
+        </if>
+    </sql>
+
+    <sql id="Range_Where_List">
+        <if test="createTimeFrom != null">
+            <![CDATA[
+            and create_time >= #{createTimeFrom, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        <if test="createTimeTo != null">
+            <![CDATA[
+            and create_time <= #{createTimeTo, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+    </sql>
+
+    <sql id="GtLastMaxId_Where">
+        <if test="lastMaxId != null and lastMaxId > 0">
+            and id > #{lastMaxId}
+        </if>
+    </sql>
+
+    <sql id="Order_By">
+        <if test="sorts != null and sorts.size > 0">
+            ORDER BY
+            <foreach collection="sorts" item="sortItem" separator=",">
+                ${sortItem.column} ${sortItem.type.message}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="selectByCondition" parameterType="com.bazinga.loom.query.DealOrderPoolQuery" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from deal_order_pool
+        <where>
+            <include refid="Equal_Where_List"/>
+            <include refid="Range_Where_List"/>
+            <include refid="GtLastMaxId_Where" />
+        </where>
+        <include refid="Order_By"/>
+        <if test="limit > 0">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="countByCondition" parameterType="com.bazinga.loom.query.DealOrderPoolQuery" resultType="java.lang.Integer">
+        select count(1)
+        from deal_order_pool
+        <where>
+            <include refid="Equal_Where_List"/>
+            <include refid="Range_Where_List"/>
+        </where>
+    </select>
+
+
+</mapper>

@@ -17,6 +17,7 @@
         <!-- 每半分钟触发任务 -->
         <task:scheduled ref="listenBestCodeJob" method="execute" initial-delay="10000" fixed-rate="25200000"/>
         <task:scheduled ref="overNightJob" method="execute" cron="00 30 01 * * ?"/>
+        <task:scheduled ref="loomFilterJob" method="execute" cron="00 30 23 * * ?"/>
 
     </task:scheduled-tasks>
 

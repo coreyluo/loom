@@ -4,6 +4,7 @@ import com.bazinga.loom.dto.DisableInsertStockDTO;
 import com.bazinga.loom.model.TradeDatePool;
 import com.bazinga.loom.query.TradeDatePoolQuery;
 import com.bazinga.loom.service.TradeDatePoolService;
+import com.bazinga.queue.LimitQueue;
 import com.bazinga.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,6 +25,8 @@ public class CacheManager implements InitializingBean {
 
     public static final Map<String, Integer> TRADE_DATE_MAP = new ConcurrentHashMap<>();
     public static final Map<String, DisableInsertStockDTO> DISABLE_INSERT_STOCK_POOL = new ConcurrentHashMap<>();
+
+    public static Map<String, LimitQueue<Long>>  STOCK_PRICE_LIMIT_QUEUE_MAP= new ConcurrentHashMap();
 
 
 

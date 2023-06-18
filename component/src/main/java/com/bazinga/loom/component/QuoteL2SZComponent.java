@@ -172,8 +172,10 @@ public class QuoteL2SZComponent extends CTORATstpLev2MdSpi implements Initializi
         commonQuoteDTO.setStockCodeName("");
         commonQuoteDTO.setBuyOnePrice(new BigDecimal(pMarketData.getBidPrice1()).setScale(2, BigDecimal.ROUND_HALF_UP));
         commonQuoteDTO.setBuyTwoPrice(new BigDecimal(pMarketData.getBidPrice2()).setScale(2, BigDecimal.ROUND_HALF_UP));
+        commonQuoteDTO.setBuyThreePrice(new BigDecimal(pMarketData.getBidPrice3()).setScale(2, BigDecimal.ROUND_HALF_UP));
         commonQuoteDTO.setSellOnePrice(new BigDecimal(pMarketData.getAskPrice1()).setScale(2, BigDecimal.ROUND_HALF_UP));
         commonQuoteDTO.setSellTwoPrice(new BigDecimal(pMarketData.getAskPrice2()).setScale(2, BigDecimal.ROUND_HALF_UP));
+        commonQuoteDTO.setSellThreePrice(new BigDecimal(pMarketData.getAskPrice3()).setScale(2, BigDecimal.ROUND_HALF_UP));
         commonQuoteDTO.setBuyOneQuantity(pMarketData.getBidVolume1());
         commonQuoteDTO.setBuyTwoQuantity(pMarketData.getBidVolume2());
         commonQuoteDTO.setSellOneQuantity(pMarketData.getAskVolume1());
@@ -309,7 +311,7 @@ public class QuoteL2SZComponent extends CTORATstpLev2MdSpi implements Initializi
         }
         log.info("L2行情包版本 {}", CTORATstpLev2MdApi.GetApiVersion());
 
-        if (true) {
+        if (false) {
             log.info("使用组播方式 serverIp{} localIp{}", quoteIpConfigs.get(0).getServerIp(), localIpList.get(0).getServerIp());
             lev2Api = CTORATstpLev2MdApi.CreateTstpLev2MdApi(lev2mdapi.getTORA_TSTP_MST_MCAST());
             lev2Api.RegisterSpi(this);
