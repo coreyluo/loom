@@ -34,6 +34,7 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
     @Autowired
     private DealOrderInfoComponent dealOrderInfoComponent;
 
+    private boolean isConnected = false;
     static
     {
         System.loadLibrary("javatraderapi");
@@ -117,7 +118,7 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
     public void OnFrontConnected()
     {
         log.info("tradeOnFrontConnected");
-
+        isConnected = true;
         CTORATstpReqUserLoginField req_user_login_field = new CTORATstpReqUserLoginField();
 
         req_user_login_field.setLogInAccount(InsertCacheManager.TRADE_ACCOUNT.getUserId());
@@ -152,7 +153,7 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
 
     public void OnFrontDisconnected(int nReason)
     {
-        System.out.printf("OnFrontDisconnected, reason[%d]\n", nReason);
+        log.info("OnFrontDisconnected trade, reason{}", nReason);
     }
 
     public void OnRspUserLogin(CTORATstpRspUserLoginField pRspUserLoginField, CTORATstpRspInfoField pRspInfo, int nRequestID)
@@ -465,6 +466,26 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
         {
             System.out.printf("OnRspTransferFund: Error! [%d] [%d] [%s]\n", nRequestID, pRspInfo.getErrorID(), pRspInfo.getErrorMsg());
         }
+    }
+
+    public void reInit(){
+        if(isConnected){
+            return;
+        }
+        log.info("重新初始化交易连接");
+        List<TradeAccount> tradeAccounts = tradeAccountService.listByCondition(new TradeAccountQuery());
+        InsertCacheManager.TRADE_ACCOUNT = tradeAccounts.get(0);
+        InsertCacheManager.TRADE_ACCOUNT.setOrderRef(InsertCacheManager.TRADE_ACCOUNT.getOrderRef()+10000L);
+        tradeAccountService.updateById(InsertCacheManager.TRADE_ACCOUNT);
+        InsertCacheManager.ORDER_REF = new AtomicLong(InsertCacheManager.TRADE_ACCOUNT.getOrderRef());
+        traderApi = CTORATstpTraderApi.CreateTstpTraderApi();
+        String apiVersion = CTORATstpTraderApi.GetApiVersion();
+        log.info("apiVersion{} {}",apiVersion, traderApi);
+        traderApi.RegisterSpi(this);
+        traderApi.RegisterFront(InsertCacheManager.TRADE_ACCOUNT.getServerIp());
+        traderApi.SubscribePrivateTopic(TORA_TE_RESUME_TYPE.TORA_TERT_RESTART);
+        traderApi.SubscribePublicTopic(TORA_TE_RESUME_TYPE.TORA_TERT_RESTART);
+        traderApi.Init();
     }
 
 

@@ -5,13 +5,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.bazinga.constant.SymbolConstants;
 import com.bazinga.enums.OrderCancelPoolStatusEnum;
 import com.bazinga.loom.component.CommonComponent;
+import com.bazinga.loom.component.LoomFilterComponent;
 import com.bazinga.loom.dto.CommonQuoteDTO;
 import com.bazinga.loom.dto.DetailOrderDTO;
 import com.bazinga.loom.dto.TransactionDTO;
+import com.bazinga.loom.model.LoomStockPool;
 import com.bazinga.loom.model.OrderCancelPool;
 import com.bazinga.loom.model.StockKbar;
 import com.bazinga.loom.model.TradeAccount;
+import com.bazinga.loom.query.LoomStockPoolQuery;
 import com.bazinga.loom.query.OrderCancelPoolQuery;
+import com.bazinga.loom.service.LoomStockPoolService;
 import com.bazinga.loom.service.OrderCancelPoolService;
 import com.bazinga.loom.service.StockKbarService;
 import com.bazinga.util.DateTimeUtils;
@@ -37,6 +41,9 @@ public class InsertCacheManager implements InitializingBean {
 
     @Autowired
     private StockKbarService stockKbarService;
+
+    @Autowired
+    private LoomFilterComponent loomFilterComponent;
 
     @Autowired
     private CommonComponent commonComponent;
@@ -74,12 +81,9 @@ public class InsertCacheManager implements InitializingBean {
 
     public static BigDecimal YESTERDAY_PLANK_CLOSE_RATE = BigDecimal.ZERO;
 
+    public static List<String> LOOM_LIST = new ArrayList<>(64);
 
-    public static Set<String> ROT_PLANK_TWO_SET = new HashSet<>(8);
 
-    public static Long DELAY_300_MILLION = 0L;
-
-    public static List<String> RISK_V2_LIST = new ArrayList<>(64);
 
 
     @Override
@@ -89,8 +93,10 @@ public class InsertCacheManager implements InitializingBean {
         log.info("初始化orderCancelPoolTimes下单次数成功 map：{}",JSONObject.toJSONString(ORDER_CANCEL_POOL_TIMES_MAP));
         initYesterdayPlankCloseRate();
         log.info("初始化昨日涨停收盘指数{}",YESTERDAY_PLANK_CLOSE_RATE);
-
+        loomFilterComponent.initLoomPool();
     }
+
+
 
     private void initYesterdayPlankCloseRate() {
         Date date = new Date();
@@ -127,18 +133,18 @@ public class InsertCacheManager implements InitializingBean {
             List<String> orderCancelPoolTimes = ORDER_CANCEL_POOL_TIMES_MAP.get(orderCancelPool.getStockCode());
             if((CollectionUtils.isEmpty(orderCancelPoolTimes))){
                 orderCancelPoolTimes = new ArrayList<>();
-                ORDER_CANCEL_POOL_TIMES_MAP.put(orderCancelPool.getStockCode(),orderCancelPoolTimes);
+                ORDER_CANCEL_POOL_TIMES_MAP.put(orderCancelPool.getStockCode() + orderCancelPool.getGearType(),orderCancelPoolTimes);
             }
             if(!orderCancelPoolTimes.contains(key)){
                 orderCancelPoolTimes.add(key);
             }
 
             if(OrderCancelPoolStatusEnum.INIT.getCode().equals(orderCancelPool.getStatus())||OrderCancelPoolStatusEnum.SUCCESS.getCode()==orderCancelPool.getStatus()){
-                List<OrderCancelPool> pools = ORDER_CANCEL_POOL_MAP.get(orderCancelPool.getStockCode());
+                List<OrderCancelPool> pools = ORDER_CANCEL_POOL_MAP.get(orderCancelPool.getStockCode()+ orderCancelPool.getGearType());
                 if(CollectionUtils.isEmpty(pools)){
                     pools = Lists.newArrayList();
-                    ORDER_CANCEL_POOL_MAP.put(orderCancelPool.getStockCode() + pools.get(0).getGearType(),pools);
-                    ORDER_CANCEL_POOL_TO_LOG_MAP.put(orderCancelPool.getStockCode(),pools);
+                    ORDER_CANCEL_POOL_MAP.put(orderCancelPool.getStockCode() + orderCancelPool.getGearType(),pools);
+                    ORDER_CANCEL_POOL_TO_LOG_MAP.put(orderCancelPool.getStockCode() + orderCancelPool.getGearType(),pools);
                 }
                 pools.add(orderCancelPool);
             }
@@ -155,6 +161,8 @@ public class InsertCacheManager implements InitializingBean {
                 orderCancelPoolTimes.add(key);
             }
             log.info("初始化orderCancelPoolTimes下单次数成功 stockCode：{} keys：{}",orderCancelPool.getStockCode(),JSONObject.toJSONString(orderCancelPoolTimes));
-        }
+    }
+
+
 
 }

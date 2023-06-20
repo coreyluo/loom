@@ -39,6 +39,9 @@ public class QuoteL2BusComponent {
     private DealOrderPoolService dealOrderPoolService;
 
     @Autowired
+    private SnapshotComponent snapshotComponent;
+
+    @Autowired
     private ApplicationContext applicationContext;
 
     public void dealWithQuote(CommonQuoteDTO commonQuoteDTO){
@@ -53,6 +56,12 @@ public class QuoteL2BusComponent {
             }else {
                 runMarket(commonQuoteDTO);
                 log.info("盘中行情数据{}",JSONObject.toJSONString(commonQuoteDTO));
+                if(quoteDate.after(DateConstant.PM_14_57_00)){
+                    if(commonQuoteDTO.getBuyThreePrice()!=null || commonQuoteDTO.getSellThreePrice()!=null){
+                        log.info("保存收盘行情快照stockCode{}",commonQuoteDTO.getStockCode());
+                        snapshotComponent.saveSnapshot(commonQuoteDTO);
+                    }
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(),e);
@@ -125,32 +134,42 @@ public class QuoteL2BusComponent {
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
-        log.info("封单数据入队列");
-        initLimitQueue(buyOneLimitQueue);
-        initLimitQueue(buyTwoLimitQueue);
-        initLimitQueue(sellOneLimitQueue);
-        initLimitQueue(sellTwoLimitQueue);
+        log.info("封单数据入队列 stockCode={}",commonQuoteDTO.getStockCode());
+        buyOneLimitQueue = initLimitQueue(buyOneLimitQueue);
+        buyTwoLimitQueue = initLimitQueue(buyTwoLimitQueue);
+        sellOneLimitQueue = initLimitQueue(sellOneLimitQueue);
+        sellTwoLimitQueue = initLimitQueue(sellTwoLimitQueue);
         buyOneLimitQueue.offer(commonQuoteDTO.getBuyOneQuantity());
         buyTwoLimitQueue.offer(commonQuoteDTO.getBuyTwoQuantity());
         sellOneLimitQueue.offer(-commonQuoteDTO.getSellOneQuantity());
         sellTwoLimitQueue.offer(-commonQuoteDTO.getSellTwoQuantity());
+        STOCK_PRICE_LIMIT_QUEUE_MAP.put(commonQuoteDTO.getStockCode() + SymbolConstants.UNDERLINE + commonQuoteDTO.getBuyOnePrice().toString(),buyOneLimitQueue);
+        STOCK_PRICE_LIMIT_QUEUE_MAP.put(commonQuoteDTO.getStockCode() + SymbolConstants.UNDERLINE + commonQuoteDTO.getBuyTwoPrice().toString(),buyTwoLimitQueue);
+        STOCK_PRICE_LIMIT_QUEUE_MAP.put(commonQuoteDTO.getStockCode() + SymbolConstants.UNDERLINE + commonQuoteDTO.getSellOnePrice().toString(),sellOneLimitQueue);
+        STOCK_PRICE_LIMIT_QUEUE_MAP.put(commonQuoteDTO.getStockCode() + SymbolConstants.UNDERLINE + commonQuoteDTO.getSellTwoPrice().toString(),sellTwoLimitQueue);
     }
 
-    private void initLimitQueue(LimitQueue<Long> limitQueue){
+    private LimitQueue<Long> initLimitQueue(LimitQueue<Long> limitQueue){
         if(limitQueue==null){
-            limitQueue =  new LimitQueue<Long>(10);
+            limitQueue = new LimitQueue<>(10);
         }
+
+        return limitQueue;
     }
 
 
     //撤挂逻辑
     private void logic(CommonQuoteDTO commonQuoteDTO,int direction, int level,LimitQueue<Long> limitQueue){
 
+        if(!"600157".equals(commonQuoteDTO.getStockCode())){
+            return;
+        }
         List<OrderCancelPool> orderCancelPools = InsertCacheManager.ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + (direction*level));
         if(!CollectionUtils.isEmpty(orderCancelPools)){
             OrderCancelPool orderCancelPool = orderCancelPools.get(0);
             if(OrderCancelPoolStatusEnum.SUCCESS.getCode().equals(orderCancelPool.getStatus())){
                 BigDecimal comparePrice = direction == 1 ? commonQuoteDTO.getBuyOnePrice():commonQuoteDTO.getSellOnePrice();
+                comparePrice = orderCancelPool.getOrderPrice();
                 if(orderCancelPool.getOrderPrice().compareTo(comparePrice)== 0){
                     if(!CollectionUtils.isEmpty(limitQueue)){
                         Long peek = limitQueue.peek();

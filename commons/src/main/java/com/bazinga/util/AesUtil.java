@@ -107,7 +107,7 @@ public class AesUtil {
 
     public static void main(String args[]) throws Exception {
         String aesKey = "singular20220724";
-        String result = encrypt("147258", aesKey);
+        String result = encrypt("23172321", aesKey);
         System.out.println(result);
         //ZKxwfzWkcJR6QAnSiUIPyT2ZdRnp0ttX45VJgeTP3CJ+l29ucpktN1oRwc9GuNeT
         System.out.println(decrypt(result, aesKey));

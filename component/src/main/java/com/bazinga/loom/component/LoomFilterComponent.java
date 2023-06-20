@@ -1,16 +1,20 @@
 package com.bazinga.loom.component;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bazinga.base.Sort;
 import com.bazinga.constant.CommonConstant;
 import com.bazinga.constant.SymbolConstants;
+import com.bazinga.loom.cache.InsertCacheManager;
 import com.bazinga.loom.model.CirculateInfo;
 import com.bazinga.loom.model.LoomStockPool;
 import com.bazinga.loom.model.StockKbar;
 import com.bazinga.loom.query.CirculateInfoQuery;
+import com.bazinga.loom.query.LoomStockPoolQuery;
 import com.bazinga.loom.query.StockKbarQuery;
 import com.bazinga.loom.service.CirculateInfoService;
 import com.bazinga.loom.service.LoomStockPoolService;
 import com.bazinga.loom.service.StockKbarService;
+import com.bazinga.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -32,6 +37,9 @@ public class LoomFilterComponent {
 
     @Autowired
     private LoomStockPoolService loomStockPoolService;
+
+    @Autowired
+    private CommonComponent commonComponent;
 
     public void filterLoom(){
 
@@ -65,5 +73,23 @@ public class LoomFilterComponent {
                 log.error(e.getMessage(),e);
             }
         }
+    }
+
+    public void initLoomPool() {
+        log.info("初始化织布池");
+        Date preTradeDate = commonComponent.preTradeDate(new Date());
+        String preTradeDateStr = DateUtil.format(preTradeDate,DateUtil.yyyyMMdd);
+
+        LoomStockPoolQuery loomQuery  = new LoomStockPoolQuery();
+        loomQuery.setKbarDate(preTradeDateStr);
+        List<LoomStockPool> loomStockPools = loomStockPoolService.listByCondition(loomQuery);
+        if(CollectionUtils.isEmpty(loomStockPools)){
+            log.info("织布池中无股票数据");
+            return;
+        }
+        for (LoomStockPool loomStockPool : loomStockPools) {
+            InsertCacheManager.LOOM_LIST.add(loomStockPool.getStockCode());
+        }
+        log.info("初始化后织布池{}", JSONObject.toJSONString(InsertCacheManager.LOOM_LIST));
     }
 }
