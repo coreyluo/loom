@@ -311,7 +311,7 @@ public class QuoteL2SZComponent extends CTORATstpLev2MdSpi implements Initializi
         }
         log.info("L2行情包版本 {}", CTORATstpLev2MdApi.GetApiVersion());
 
-        if (false) {
+        if (true) {
             log.info("使用组播方式 serverIp{} localIp{}", quoteIpConfigs.get(0).getServerIp(), localIpList.get(0).getServerIp());
             lev2Api = CTORATstpLev2MdApi.CreateTstpLev2MdApi(lev2mdapi.getTORA_TSTP_MST_MCAST());
             lev2Api.RegisterSpi(this);

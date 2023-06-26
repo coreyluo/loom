@@ -3,6 +3,7 @@ package com.bazinga.loom.query;
 
 import com.bazinga.base.PagingQuery;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import java.io.Serializable;
@@ -39,6 +40,8 @@ public class DealOrderPoolQuery extends PagingQuery implements Serializable {
      * 股票名称
      */
     private String stockName;
+
+    private BigDecimal tradePrice;
 
     /**
      * 创建时间 开始

@@ -146,7 +146,8 @@ public class InsertOrderListener implements ApplicationListener<InsertOrderEvent
             orderCancelPool.setOrderTimeMillis(System.currentTimeMillis());
             orderCancelPool.setOrderStamp(DateTimeUtils.trans2CommonFormat(insertOrderEvent.getQuoteTime(),false));
             orderCancelPool.setRealCannonQuantity(insertOrderEvent.getCannonQuantity());
-            quantity = InsertCacheManager.TRADE_ACCOUNT.getPosition().divide(CommonConstant.DECIMAL_HUNDRED,0,BigDecimal.ROUND_DOWN).divide(insertOrderEvent.getOrderPrice(),0, BigDecimal.ROUND_DOWN).intValue() * 100;
+           // quantity = InsertCacheManager.TRADE_ACCOUNT.getPosition().divide(CommonConstant.DECIMAL_HUNDRED,0,BigDecimal.ROUND_DOWN).divide(insertOrderEvent.getOrderPrice(),0, BigDecimal.ROUND_DOWN).intValue() * 100;
+            quantity = InsertCacheManager.TRADE_ACCOUNT.getPosition().intValue();
 
             if (quantity >= CommonConstant.HUNDRED) {
                 //超过万手处理

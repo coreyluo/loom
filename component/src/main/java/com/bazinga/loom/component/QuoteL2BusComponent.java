@@ -11,6 +11,7 @@ import com.bazinga.loom.event.InsertOrderEvent;
 import com.bazinga.loom.model.DealOrderPool;
 import com.bazinga.loom.model.OrderCancelPool;
 import com.bazinga.loom.service.DealOrderPoolService;
+import com.bazinga.loom.service.OrderCancelPoolService;
 import com.bazinga.loom.util.UniqueKeyUtil;
 import com.bazinga.queue.LimitQueue;
 import com.bazinga.util.DateTimeUtils;
@@ -42,14 +43,19 @@ public class QuoteL2BusComponent {
     private SnapshotComponent snapshotComponent;
 
     @Autowired
+    private OrderCancelPoolService orderCancelPoolService;
+
+    @Autowired
     private ApplicationContext applicationContext;
 
     public void dealWithQuote(CommonQuoteDTO commonQuoteDTO){
         try {
-            Date date = new Date();
             String quoteTime = DateTimeUtils.trans2CommonFormat(commonQuoteDTO.getQuoteTime(),false);
             Date quoteDate = DateUtil.parseDate(DateConstant.TODAY_STRING + quoteTime, DateUtil.yyyyMMddHHmmssSSS);
-
+            if(quoteDate==null){
+                log.info("时间解析错误quoteTime{}",commonQuoteDTO.getQuoteTime());
+                return;
+            }
             if(quoteDate.before(DateConstant.AM_09_25_10)){
                 log.info("集合行情数据{}", JSONObject.toJSONString(commonQuoteDTO));
                 callMarket(commonQuoteDTO);
@@ -57,7 +63,8 @@ public class QuoteL2BusComponent {
                 runMarket(commonQuoteDTO);
                 log.info("盘中行情数据{}",JSONObject.toJSONString(commonQuoteDTO));
                 if(quoteDate.after(DateConstant.PM_14_57_00)){
-                    if(commonQuoteDTO.getBuyThreePrice()!=null || commonQuoteDTO.getSellThreePrice()!=null){
+                    if(commonQuoteDTO.getBuyThreePrice().compareTo(BigDecimal.ZERO)>0
+                            || commonQuoteDTO.getSellThreePrice().compareTo(BigDecimal.ZERO)>0){
                         log.info("保存收盘行情快照stockCode{}",commonQuoteDTO.getStockCode());
                         snapshotComponent.saveSnapshot(commonQuoteDTO);
                     }
@@ -76,12 +83,13 @@ public class QuoteL2BusComponent {
         List<OrderCancelPool> sellTwoOrderCancelPools = ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + -2);
         List<OrderCancelPool> buyOneorderCancelPools = ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + 1);
         List<OrderCancelPool> buyTwoorderCancelPools = ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + 2);*/
-
-
+        if(commonQuoteDTO.getBuyOneQuantity()==0){
+            return;
+        }
         Long unaviliable = commonQuoteDTO.getBuyTwoQuantity()==null? commonQuoteDTO.getSellTwoQuantity():commonQuoteDTO.getBuyTwoQuantity();
 
         //匹配量异常放量 撤当前价单子
-        if(commonQuoteDTO.getBuyOneQuantity() * 10 > unaviliable * 3){
+        if(commonQuoteDTO.getBuyOneQuantity() * 5 > unaviliable * 3){
             for (GearLevelEnum value : GearLevelEnum.values()) {
                 List<OrderCancelPool> orderCancelPools = ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + value.getCode());
                 if(CollectionUtils.isEmpty(orderCancelPools)){
@@ -169,7 +177,7 @@ public class QuoteL2BusComponent {
             OrderCancelPool orderCancelPool = orderCancelPools.get(0);
             if(OrderCancelPoolStatusEnum.SUCCESS.getCode().equals(orderCancelPool.getStatus())){
                 BigDecimal comparePrice = direction == 1 ? commonQuoteDTO.getBuyOnePrice():commonQuoteDTO.getSellOnePrice();
-                comparePrice = orderCancelPool.getOrderPrice();
+               // comparePrice = orderCancelPool.getOrderPrice();
                 if(orderCancelPool.getOrderPrice().compareTo(comparePrice)== 0){
                     if(!CollectionUtils.isEmpty(limitQueue)){
                         Long peek = limitQueue.peek();
@@ -184,6 +192,7 @@ public class QuoteL2BusComponent {
                                     //第2对变1对
                                     for (OrderCancelPool cancelPool : orderCancelPools2) {
                                         cancelPool.setGearType(direction);
+                                        orderCancelPoolService.updateById(orderCancelPool);
                                     }
                                     ORDER_CANCEL_POOL_MAP.put(commonQuoteDTO.getStockCode() + direction,orderCancelPools2);
                                 }
