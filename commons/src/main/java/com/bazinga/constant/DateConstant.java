@@ -83,6 +83,7 @@ public class DateConstant {
     public static final Date PM_14_56_00;
     public static final Date PM_14_56_57;
     public static final Date PM_14_57_00;
+    public static final Date PM_14_58_00;
     public static final Date PM_17_30_00;
     public static String TODAY_STRING;
 
@@ -151,6 +152,7 @@ public class DateConstant {
         PM_14_50_00 = DateUtil.parseDate(dayString + " 14:50:00", DateUtil.DEFAULT_FORMAT);
         PM_14_56_00 = DateUtil.parseDate(dayString + " 14:56:00", DateUtil.DEFAULT_FORMAT);
         PM_14_57_00 = DateUtil.parseDate(dayString + " 14:57:00", DateUtil.DEFAULT_FORMAT);
+        PM_14_58_00 = DateUtil.parseDate(dayString + " 14:58:00", DateUtil.DEFAULT_FORMAT);
         PM_14_56_57 = DateUtil.parseDate(dayString + " 14:56:57", DateUtil.DEFAULT_FORMAT);
         AM_09_40_00 = DateUtil.parseDate(dayString + " 09:40:00", DateUtil.DEFAULT_FORMAT);
         AM_09_45_00 = DateUtil.parseDate(dayString + " 09:45:00", DateUtil.DEFAULT_FORMAT);

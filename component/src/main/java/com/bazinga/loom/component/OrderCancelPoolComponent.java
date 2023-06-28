@@ -58,10 +58,11 @@ public class OrderCancelPoolComponent {
 
     }
 
-    public void invokeCancel(List<OrderCancelPool> orderCancelPools){
+    public void invokeCancel(List<OrderCancelPool> orderCancelPools,Integer gearLevel){
         List<CancelOrderRequestDTO> cancelOrderRequestDTOS = buildCancelOrderRequestDTOS(orderCancelPools);
+        CancelOrderRequestDTO cancelDTO = cancelOrderRequestDTOS.get(0);
+        InsertCacheManager.ORDER_CANCEL_POOL_MAP.remove(cancelDTO.getStockCode()+gearLevel);
         for (CancelOrderRequestDTO cancelOrderRequestDTO : cancelOrderRequestDTOS) {
-          //  CancelCacheManager.cleanCancelMap(orderCancelDto.getStockCode());
             tradeApiComponent.cancelOrder(cancelOrderRequestDTO);
             log.info("触发撤单条件 stockCode ={}", cancelOrderRequestDTO.getStockCode());
         }
