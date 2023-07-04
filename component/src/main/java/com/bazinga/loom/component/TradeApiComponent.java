@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.bazinga.loom.cache.InsertCacheManager;
 import com.bazinga.loom.dto.CancelOrderRequestDTO;
 import com.bazinga.loom.dto.OrderRequestDTO;
+import com.bazinga.loom.dto.ReInsertInfoDTO;
 import com.bazinga.loom.dto.ReturnOrderDTO;
+import com.bazinga.loom.event.InsertOrderEvent;
 import com.bazinga.loom.model.TradeAccount;
 import com.bazinga.loom.query.TradeAccountQuery;
 import com.bazinga.loom.service.TradeAccountService;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,6 +36,10 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
 
     @Autowired
     private DealOrderInfoComponent dealOrderInfoComponent;
+
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     private boolean isConnected = false;
     static
@@ -83,6 +90,14 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
         log.info("卖出orderRef stockCode ={} orderPrice{} orderRef{} orderQuantity{} 下单结果{}", requestDTO.getStockCode(),requestDTO.getOrderPrice(),requestDTO.getLocalSign(),requestDTO.getVolume(),result);
     }
 
+    public void reOrder(ReInsertInfoDTO reInsertInfoDTO){
+
+        applicationContext.publishEvent(new InsertOrderEvent(this, reInsertInfoDTO.getStockCode(), reInsertInfoDTO.getOrderPrice(),
+                1L, "", reInsertInfoDTO.getDirection()));
+
+
+    }
+
     /**
      * 撤单
      * @param cancelOrderRequestDTO 参数
@@ -118,7 +133,6 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
     public void OnFrontConnected()
     {
         log.info("tradeOnFrontConnected");
-        isConnected = true;
         CTORATstpReqUserLoginField req_user_login_field = new CTORATstpReqUserLoginField();
 
         req_user_login_field.setLogInAccount(InsertCacheManager.TRADE_ACCOUNT.getUserId());
@@ -162,6 +176,7 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
         if (pRspInfo.getErrorID() == 0)
         {
             log.info("tradeapi login success! maxOrderRef{}",pRspUserLoginField.getMaxOrderRef());
+            isConnected = true;
 			/*if (true)
 			{
 				// ��ѯ��Լ��Ϣ
@@ -440,7 +455,12 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
                     pInputOrderActionField.getOrderSysID());
             int orderActionRef = pInputOrderActionField.getOrderRef();
             String orderRefStr = String.valueOf(orderActionRef);
-          //  cancelOrderLogComponent.cancelSuccess(orderRefStr,pInputOrderActionField.getOrderSysID());
+            ReInsertInfoDTO reInsertInfoDTO = InsertCacheManager.ORDER_NO_REINSET_MAP.get(pInputOrderActionField.getOrderSysID());
+            orderCancelPoolComponent.cancelSuccess(orderRefStr,pInputOrderActionField.getOrderSysID(),reInsertInfoDTO);
+            if(reInsertInfoDTO!=null){
+                log.info("撤单后需要重新挂单 orderNo{}",pInputOrderActionField.getOrderSysID());
+                reOrder(reInsertInfoDTO);
+            }
         } else {
             log.info("撤单请求回调触发失败 回调参数：{} 委托编号：{}  失败代码：{} 失败描述：{}",pInputOrderActionField.getOrderRef(),
                     pInputOrderActionField.getOrderSysID(),pRspInfo.getErrorID(),pRspInfo.getErrorMsg());

@@ -26,8 +26,7 @@ public class CacheManager implements InitializingBean {
     public static final Map<String, Integer> TRADE_DATE_MAP = new ConcurrentHashMap<>();
     public static final Map<String, DisableInsertStockDTO> DISABLE_INSERT_STOCK_POOL = new ConcurrentHashMap<>();
 
-    public static Map<String, LimitQueue<Long>>  STOCK_PRICE_LIMIT_QUEUE_MAP= new ConcurrentHashMap();
-
+    public static Map<String, LimitQueue<Long>>  STOCK_PRICE_LIMIT_QUEUE_MAP= new ConcurrentHashMap<>();
 
 
 

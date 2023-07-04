@@ -1,11 +1,13 @@
 package com.bazinga.loom.component;
 
 
+import com.bazinga.base.Sort;
 import com.bazinga.constant.DateConstant;
 import com.bazinga.constant.SymbolConstants;
 import com.bazinga.loom.dto.CommonQuoteDTO;
 import com.bazinga.loom.model.StockCloseSnapshot;
 import com.bazinga.loom.model.StockOpenSnapshot;
+import com.bazinga.loom.query.StockOpenSnapshotQuery;
 import com.bazinga.loom.service.StockCloseSnapshotService;
 import com.bazinga.loom.service.StockOpenSnapshotService;
 import com.bazinga.util.DateTimeUtils;
@@ -13,8 +15,10 @@ import com.bazinga.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -25,6 +29,21 @@ public class SnapshotComponent {
 
     @Autowired
     private StockOpenSnapshotService stockOpenSnapshotService;
+
+
+    public Long getAvgQuantity(String stockCode){
+        StockOpenSnapshotQuery query = new StockOpenSnapshotQuery();
+        query.setStockCode(stockCode);
+        query.addOrderBy("kbar_date", Sort.SortType.DESC);
+        query.setLimit(5);
+        List<StockOpenSnapshot> stockOpenSnapshots = stockOpenSnapshotService.listByCondition(query);
+
+        if(CollectionUtils.isEmpty(stockOpenSnapshots)){
+            return 0L;
+        }
+        long sum = stockOpenSnapshots.stream().mapToLong(StockOpenSnapshot::getTradeQuantity).sum();
+        return sum/stockOpenSnapshots.size();
+    }
 
     public void saveSnapshot(CommonQuoteDTO commonQuoteDTO){
         try {

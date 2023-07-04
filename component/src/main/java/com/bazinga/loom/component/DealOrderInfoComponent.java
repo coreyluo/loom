@@ -78,12 +78,12 @@ public class DealOrderInfoComponent {
             if(firstDealTime==null){
                 InsertCacheManager.ORDER_FIRST_DEAL_TIME.put(orderNo,new Date().getTime());
             }
+            InsertCacheManager.DEAL_DIRECTION_STOCK_MAP.put(stockCode+ orderCancelPool.getGearType(),orderCancelPool.getGearType());
             orderCancelPoolComponent.updateOrderCancelPoolStatus(stockCode, orderNo, OrderCancelPoolStatusEnum.DEAL_SUCCESS);
             log.info("已成交交易信息 更新orderCancelPool数据库数据成功 stockCode：{} orderNo:{}",stockCode,orderNo);
             orderCancelPoolComponent.removeOrderCancelPoolFromCache(stockCode, orderNo);
             log.info("已成交交易信息 删除orderCancelPool内存数据成功 stockCode：{} orderNo:{}",stockCode,orderNo);
             //放入禁止下单池
-
             disableInsertStockPoolComponent.addManualDisableStockCode(stockCode,orderCancelPool.getGearType());
             log.info("已成交交易信息添加禁止下单池成功 stockCode：{} orderNo:{}",stockCode,orderNo);
         } catch (Exception e){

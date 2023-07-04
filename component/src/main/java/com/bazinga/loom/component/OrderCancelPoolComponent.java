@@ -8,6 +8,7 @@ import com.bazinga.loom.cache.CacheManager;
 import com.bazinga.loom.cache.InsertCacheManager;
 import com.bazinga.loom.dto.CancelOrderRequestDTO;
 import com.bazinga.loom.dto.DisableInsertStockDTO;
+import com.bazinga.loom.dto.ReInsertInfoDTO;
 import com.bazinga.loom.dto.ReturnOrderDTO;
 import com.bazinga.loom.model.DisableInsertStockPool;
 import com.bazinga.loom.model.OrderCancelPool;
@@ -166,21 +167,6 @@ public class OrderCancelPoolComponent {
         }
     }
 
-    public static void main(String[] args) {
-
-        Map<String, List<OrderCancelPool>> map = new HashMap<>();
-        OrderCancelPool orderCancelPool1 = new OrderCancelPool();
-        OrderCancelPool orderCancelPool2 = new OrderCancelPool();
-        OrderCancelPool orderCancelPool3 = new OrderCancelPool();
-        OrderCancelPool orderCancelPool4 = new OrderCancelPool();
-        List<OrderCancelPool> list = Lists.newArrayList(orderCancelPool1);
-        map.put("000001",list);
-
-        List<OrderCancelPool> orderCancelPools = map.get("000001");
-        OrderCancelPool remove = orderCancelPools.remove(0);
-        List<OrderCancelPool> orderCancelPools1 = map.get("000001");
-        System.out.println("1111111111");
-    }
 
     public List<OrderCancelPool> listWaitingCancelOrderByDay(String stockCode, Date day){
         Date start = DateTimeUtils.getDate000000(day);
@@ -247,4 +233,20 @@ public class OrderCancelPoolComponent {
     }
 
 
+    public void cancelSuccess(String orderRef, String orderSysID, ReInsertInfoDTO reInsertInfoDTO) {
+        OrderCancelPoolQuery query = new OrderCancelPoolQuery();
+        query.setOrderNo(orderSysID);
+        query.setLocalSign(orderRef);
+        List<OrderCancelPool> orderCancelPools = orderCancelPoolService.listByCondition(query);
+        if(CollectionUtils.isEmpty(orderCancelPools)){
+            return;
+        }
+        OrderCancelPool orderCancelPool = orderCancelPools.get(0);
+        orderCancelPool.setStatus(OrderCancelPoolStatusEnum.SUCCESS.getCode());
+        orderCancelPoolService.updateById(orderCancelPool);
+        if(reInsertInfoDTO==null){
+            log.info("撤单成功 移除撤单缓存{}",orderCancelPool.getStockCode());
+            InsertCacheManager.ORDER_CANCEL_POOL_MAP.remove(orderCancelPool.getStockCode()+ orderCancelPool.getGearType());
+        }
+    }
 }

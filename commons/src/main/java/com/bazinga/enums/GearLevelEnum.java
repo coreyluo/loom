@@ -1,10 +1,8 @@
 package com.bazinga.enums;
 
 public enum GearLevelEnum {
-    BUY_ONE(1,"买一"),
-    BUY_TWO(2,"买一"),
-    SELL_ONE(-1,"卖一"),
-    SELL_TWO(-2,"卖二");
+    BUY(1,"买"),
+    SELL(-1,"卖");
 
 
     private Integer code;

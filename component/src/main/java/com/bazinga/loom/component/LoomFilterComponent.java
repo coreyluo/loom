@@ -8,12 +8,14 @@ import com.bazinga.loom.cache.InsertCacheManager;
 import com.bazinga.loom.model.CirculateInfo;
 import com.bazinga.loom.model.LoomStockPool;
 import com.bazinga.loom.model.StockKbar;
+import com.bazinga.loom.model.StockOpenSnapshot;
 import com.bazinga.loom.query.CirculateInfoQuery;
 import com.bazinga.loom.query.LoomStockPoolQuery;
 import com.bazinga.loom.query.StockKbarQuery;
 import com.bazinga.loom.service.CirculateInfoService;
 import com.bazinga.loom.service.LoomStockPoolService;
 import com.bazinga.loom.service.StockKbarService;
+import com.bazinga.loom.service.StockOpenSnapshotService;
 import com.bazinga.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,9 @@ public class LoomFilterComponent {
 
     @Autowired
     private LoomStockPoolService loomStockPoolService;
+
+    @Autowired
+    private StockOpenSnapshotService stockOpenSnapshotService;
 
     @Autowired
     private CommonComponent commonComponent;

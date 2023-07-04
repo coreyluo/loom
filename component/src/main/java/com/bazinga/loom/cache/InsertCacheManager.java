@@ -2,19 +2,20 @@ package com.bazinga.loom.cache;
 
 import com.alibaba.fastjson.JSONObject;
 
+import com.bazinga.constant.DateConstant;
 import com.bazinga.constant.SymbolConstants;
 import com.bazinga.enums.OrderCancelPoolStatusEnum;
 import com.bazinga.loom.component.CommonComponent;
 import com.bazinga.loom.component.LoomFilterComponent;
 import com.bazinga.loom.dto.CommonQuoteDTO;
 import com.bazinga.loom.dto.DetailOrderDTO;
+import com.bazinga.loom.dto.ReInsertInfoDTO;
 import com.bazinga.loom.dto.TransactionDTO;
-import com.bazinga.loom.model.LoomStockPool;
-import com.bazinga.loom.model.OrderCancelPool;
-import com.bazinga.loom.model.StockKbar;
-import com.bazinga.loom.model.TradeAccount;
+import com.bazinga.loom.model.*;
+import com.bazinga.loom.query.DealOrderPoolQuery;
 import com.bazinga.loom.query.LoomStockPoolQuery;
 import com.bazinga.loom.query.OrderCancelPoolQuery;
+import com.bazinga.loom.service.DealOrderPoolService;
 import com.bazinga.loom.service.LoomStockPoolService;
 import com.bazinga.loom.service.OrderCancelPoolService;
 import com.bazinga.loom.service.StockKbarService;
@@ -44,6 +45,9 @@ public class InsertCacheManager implements InitializingBean {
 
     @Autowired
     private LoomFilterComponent loomFilterComponent;
+
+    @Autowired
+    private DealOrderPoolService dealOrderPoolService;
 
     @Autowired
     private CommonComponent commonComponent;
@@ -83,19 +87,33 @@ public class InsertCacheManager implements InitializingBean {
 
     public static List<String> LOOM_LIST = new ArrayList<>(64);
 
+    public static Map<String, ReInsertInfoDTO> ORDER_NO_REINSET_MAP = new ConcurrentHashMap<>();
 
+    public static Map<String, Integer> DEAL_DIRECTION_STOCK_MAP = new ConcurrentHashMap<>();
 
 
     @Override
     public void afterPropertiesSet() throws Exception {
         initOrderCancelPool();
         log.info("初始化orderCancelPool成功 map：{}",JSONObject.toJSONString(ORDER_CANCEL_POOL_MAP));
+        initDealDirection();
+        log.info("初始化成交信息{}",JSONObject.toJSONString(DEAL_DIRECTION_STOCK_MAP));
+
         log.info("初始化orderCancelPoolTimes下单次数成功 map：{}",JSONObject.toJSONString(ORDER_CANCEL_POOL_TIMES_MAP));
-        initYesterdayPlankCloseRate();
-        log.info("初始化昨日涨停收盘指数{}",YESTERDAY_PLANK_CLOSE_RATE);
         loomFilterComponent.initLoomPool();
     }
 
+    private void initDealDirection() {
+        DealOrderPoolQuery query = new DealOrderPoolQuery();
+        query.setCreateTimeTo(DateConstant.PM_15_00_30);
+        List<DealOrderPool> dealOrderPools = dealOrderPoolService.listByCondition(query);
+        if(!CollectionUtils.isEmpty(dealOrderPools)){
+            for (DealOrderPool dealOrderPool : dealOrderPools) {
+                InsertCacheManager.DEAL_DIRECTION_STOCK_MAP.put(dealOrderPool.getStockCode()+ dealOrderPool.getGearType(),dealOrderPool.getGearType());
+            }
+        }
+
+    }
 
 
     private void initYesterdayPlankCloseRate() {
