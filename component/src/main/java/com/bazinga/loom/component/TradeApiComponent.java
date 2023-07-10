@@ -41,7 +41,7 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
     @Autowired
     private ApplicationContext applicationContext;
 
-    private boolean isConnected = false;
+    public static boolean isConnected = false;
     static
     {
         System.loadLibrary("javatraderapi");

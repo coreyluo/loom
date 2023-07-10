@@ -73,7 +73,7 @@ public class QuoteL2BusComponent {
                 }
             } else {
                 log.info("盘中行情数据{}", JSONObject.toJSONString(commonQuoteDTO));
-                runMarket(commonQuoteDTO);
+                runMarket(commonQuoteDTO,quoteDate);
                 if (quoteDate.after(DateConstant.PM_14_57_00)) {
                     if (commonQuoteDTO.getBuyThreePrice().compareTo(BigDecimal.ZERO) > 0
                             || commonQuoteDTO.getSellThreePrice().compareTo(BigDecimal.ZERO) > 0) {
@@ -140,8 +140,11 @@ public class QuoteL2BusComponent {
 
     }
 
-    private void runMarket(CommonQuoteDTO commonQuoteDTO) {
+    private void runMarket(CommonQuoteDTO commonQuoteDTO,Date quoteDate) {
         if(!InsertCacheManager.LOOM_LIST.contains(commonQuoteDTO.getStockCode())){
+            return;
+        }
+        if(quoteDate.after(DateConstant.PM_14_56_57)){
             return;
         }
         LimitQueue<Long> buyOneLimitQueue = STOCK_PRICE_LIMIT_QUEUE_MAP.get(commonQuoteDTO.getStockCode() + SymbolConstants.UNDERLINE + commonQuoteDTO.getBuyOnePrice().toString());
@@ -210,9 +213,10 @@ public class QuoteL2BusComponent {
                         reInsertInfoDTO.setDirection(direction);
                         reInsertInfoDTO.setOrderPrice(commonQuoteDTO.getBuyOnePrice());
                         reInsertInfoDTO.setStockCode(commonQuoteDTO.getStockCode());
-                        InsertCacheManager.ORDER_NO_REINSET_MAP.put(orderCancelPools.get(0).getOrderNo(),reInsertInfoDTO);
-                        orderCancelPoolComponent.invokeCancel(orderCancelPools,direction);
-
+                        if(orderCancelPools.get(0).getOrderNo()!=null){
+                            InsertCacheManager.ORDER_NO_REINSET_MAP.put(orderCancelPools.get(0).getOrderNo(),reInsertInfoDTO);
+                            orderCancelPoolComponent.invokeCancel(orderCancelPools,direction);
+                        }
                     }
                 }
             }

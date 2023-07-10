@@ -34,6 +34,8 @@ public class OverNightOrderComponent {
     @Autowired
     private ApplicationContext applicationContext;
 
+    private boolean isOrder = false;
+
     public void overNight(){
 
         Date preTradeDate = commonComponent.preTradeDate(new Date());
@@ -44,6 +46,14 @@ public class OverNightOrderComponent {
         List<LoomStockPool> loomStockPools = loomStockPoolService.listByCondition(loomQuery);
         if(CollectionUtils.isEmpty(loomStockPools)){
             log.info("织布池中无股票数据");
+            return;
+        }
+        if(!TradeApiComponent.isConnected){
+            log.info("交易未连接");
+            return;
+        }
+        if(isOrder){
+            log.info("已下隔夜单");
             return;
         }
         for (LoomStockPool loomStockPool : loomStockPools) {
@@ -75,10 +85,8 @@ public class OverNightOrderComponent {
             }else {
                 applicationContext.publishEvent(new InsertOrderEvent(this,loomStockPool.getStockCode(),byUniqueKey.getAsk1Price(),0L,"",-1));
             }
-
-
-
         }
+        isOrder = true;
 
 
     }

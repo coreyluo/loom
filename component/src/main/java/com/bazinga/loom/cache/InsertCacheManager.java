@@ -106,6 +106,7 @@ public class InsertCacheManager implements InitializingBean {
     private void initDealDirection() {
         DealOrderPoolQuery query = new DealOrderPoolQuery();
         query.setCreateTimeTo(DateConstant.PM_15_00_30);
+        query.setCreateTimeFrom(DateConstant.AM_09_19_50);
         List<DealOrderPool> dealOrderPools = dealOrderPoolService.listByCondition(query);
         if(!CollectionUtils.isEmpty(dealOrderPools)){
             for (DealOrderPool dealOrderPool : dealOrderPools) {
