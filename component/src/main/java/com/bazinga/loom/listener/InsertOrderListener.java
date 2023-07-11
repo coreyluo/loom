@@ -116,6 +116,7 @@ public class InsertOrderListener implements ApplicationListener<InsertOrderEvent
         for (OrderCancelPool orderCancelPool : orderCancelPoolList) {
             orderCancelPool.setLocalSign(InsertCacheManager.getOrderRef());
         }
+        log.info("同步到撤单缓存stockCode{} gearType{}", stockCode,gearLevel);
         InsertCacheManager.ORDER_CANCEL_POOL_MAP.put(stockCode + gearLevel,orderCancelPoolList);
         InsertCacheManager.ORDER_CANCEL_POOL_TO_LOG_MAP.put(stockCode + gearLevel,orderCancelPoolList);
 
