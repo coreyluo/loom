@@ -64,13 +64,14 @@ public class QuoteL2BusComponent {
                 return;
             }
             if (quoteDate.before(DateConstant.AM_09_25_10)) {
-                log.info("集合行情数据{}", JSONObject.toJSONString(commonQuoteDTO));
-                callMarket(commonQuoteDTO);
                 if (commonQuoteDTO.getBuyThreePrice().compareTo(BigDecimal.ZERO) > 0
                         || commonQuoteDTO.getSellThreePrice().compareTo(BigDecimal.ZERO) > 0) {
                     log.info("保存开盘行情快照stockCode{}", commonQuoteDTO.getStockCode());
                     stockOpen(commonQuoteDTO);
                     snapshotComponent.saveOpenSnapshot(commonQuoteDTO);
+                }else {
+                    log.info("集合行情数据{}", JSONObject.toJSONString(commonQuoteDTO));
+                    callMarket(commonQuoteDTO);
                 }
             } else {
                 log.info("盘中行情数据{}", JSONObject.toJSONString(commonQuoteDTO));
