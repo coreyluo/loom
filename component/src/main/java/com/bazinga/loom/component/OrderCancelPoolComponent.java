@@ -2,6 +2,7 @@ package com.bazinga.loom.component;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.bazinga.constant.DateConstant;
 import com.bazinga.enums.OperateStatusEnum;
 import com.bazinga.enums.OrderCancelPoolStatusEnum;
 import com.bazinga.loom.cache.CacheManager;
@@ -131,8 +132,10 @@ public class OrderCancelPoolComponent {
         OrderCancelPoolQuery query = new OrderCancelPoolQuery();
         query.setStockCode(stockCode);
         query.setOrderNo(orderNo);
+        query.setCreateTimeFrom(DateTimeUtils.getDate000000());
         List<OrderCancelPool> orderCancelPools = orderCancelPoolService.listByCondition(query);
         if(CollectionUtils.isEmpty(orderCancelPools)){
+            log.info("更新已成交失败未查询到orderCancelPool表数据 stockCode{} orderNo{}",stockCode,orderNo);
             return;
         }
         OrderCancelPool orderCancelPool = orderCancelPools.get(0);
@@ -140,8 +143,8 @@ public class OrderCancelPoolComponent {
         orderCancelPoolService.updateById(orderCancelPool);
     }
 
-    public void removeOrderCancelPoolFromCache(String stockCode,String orderNo){
-        List<OrderCancelPool> orderCancelPools = InsertCacheManager.ORDER_CANCEL_POOL_MAP.get(stockCode);
+    public void removeOrderCancelPoolFromCache(String stockCode,String orderNo,Integer gearType){
+        List<OrderCancelPool> orderCancelPools = InsertCacheManager.ORDER_CANCEL_POOL_MAP.get(stockCode+ gearType);
         log.info("移除内存orderCancelPool数据前 stockCode:{} orderNo:{} map：{}", stockCode,orderNo,JSONObject.toJSONString(orderCancelPools));
         if(CollectionUtils.isEmpty(orderCancelPools)){
             return;
@@ -163,7 +166,7 @@ public class OrderCancelPoolComponent {
         }
         log.info("移除内存orderCancelPool数据后 stockCode:{} orderNo:{} map：{}", stockCode,orderNo,JSONObject.toJSONString(orderCancelPools));
         if(CollectionUtils.isEmpty(orderCancelPools)){
-            InsertCacheManager.ORDER_CANCEL_POOL_MAP.remove(stockCode);
+            InsertCacheManager.ORDER_CANCEL_POOL_MAP.remove(stockCode+ gearType);
         }
     }
 

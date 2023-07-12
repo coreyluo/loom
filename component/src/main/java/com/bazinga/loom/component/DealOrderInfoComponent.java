@@ -50,6 +50,7 @@ public class DealOrderInfoComponent {
             OrderCancelPoolQuery orderCancelPoolQuery = new OrderCancelPoolQuery();
             orderCancelPoolQuery.setStockCode(stockCode);
             orderCancelPoolQuery.setOrderNo(orderNo);
+            orderCancelPoolQuery.setCreateTimeFrom(DateTimeUtils.getDate000000());
             List<OrderCancelPool> orderCancelPools = orderCancelPoolService.listByCondition(orderCancelPoolQuery);
             if (CollectionUtils.isEmpty(orderCancelPools)) {
                 log.info("已成交交易信息 未查询到orderCancelPool存在 stockCode:{} orderNo:{} ",stockCode,orderNo);
@@ -81,7 +82,7 @@ public class DealOrderInfoComponent {
             InsertCacheManager.DEAL_DIRECTION_STOCK_MAP.put(stockCode+ orderCancelPool.getGearType(),orderCancelPool.getGearType());
             orderCancelPoolComponent.updateOrderCancelPoolStatus(stockCode, orderNo, OrderCancelPoolStatusEnum.DEAL_SUCCESS);
             log.info("已成交交易信息 更新orderCancelPool数据库数据成功 stockCode：{} orderNo:{}",stockCode,orderNo);
-            orderCancelPoolComponent.removeOrderCancelPoolFromCache(stockCode, orderNo);
+            orderCancelPoolComponent.removeOrderCancelPoolFromCache(stockCode, orderNo,orderCancelPool.getGearType());
             log.info("已成交交易信息 删除orderCancelPool内存数据成功 stockCode：{} orderNo:{}",stockCode,orderNo);
             //放入禁止下单池
             disableInsertStockPoolComponent.addManualDisableStockCode(stockCode,orderCancelPool.getGearType());
@@ -116,7 +117,7 @@ public class DealOrderInfoComponent {
                 if(!orderCancelPool.getStatus().equals(OrderCancelPoolStatusEnum.DEAL_SUCCESS.getCode())) {
                     orderCancelPoolComponent.updateOrderCancelPoolStatus(orderCancelPool.getStockCode(), orderCancelPool.getOrderNo(), OrderCancelPoolStatusEnum.DEAL_SUCCESS);
                     log.info("已成交交易信息 更新orderCancelPool数据库数据成功 stockCode：{} orderNo:{}", orderCancelPool.getStockCode(), orderCancelPool.getOrderNo());
-                    orderCancelPoolComponent.removeOrderCancelPoolFromCache(orderCancelPool.getStockCode(), orderCancelPool.getOrderNo());
+                    orderCancelPoolComponent.removeOrderCancelPoolFromCache(orderCancelPool.getStockCode(), orderCancelPool.getOrderNo(),orderCancelPool.getGearType());
                     log.info("已成交交易信息 删除orderCancelPool内存数据成功 stockCode：{} orderNo:{}", orderCancelPool.getStockCode(), orderCancelPool.getOrderNo());
                 }
             }

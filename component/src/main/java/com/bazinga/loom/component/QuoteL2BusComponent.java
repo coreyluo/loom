@@ -201,7 +201,8 @@ public class QuoteL2BusComponent {
         String key = commonQuoteDTO.getStockCode() + direction;
         List<OrderCancelPool> orderCancelPools = InsertCacheManager.ORDER_CANCEL_POOL_MAP.get(key);
         Integer dealDirection = InsertCacheManager.DEAL_DIRECTION_STOCK_MAP.get(key);
-        if(dealDirection!=null && direction ==dealDirection){
+        if(dealDirection!=null && direction == dealDirection){
+            log.info("stockCode{} 方向{}已成交",commonQuoteDTO.getStockCode(),direction);
             return;
         }
         //买
