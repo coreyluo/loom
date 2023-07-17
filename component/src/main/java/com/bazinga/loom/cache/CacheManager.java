@@ -1,5 +1,6 @@
 package com.bazinga.loom.cache;
 
+import com.bazinga.loom.dto.CommonQuoteDTO;
 import com.bazinga.loom.dto.DisableInsertStockDTO;
 import com.bazinga.loom.model.TradeDatePool;
 import com.bazinga.loom.query.TradeDatePoolQuery;
@@ -28,7 +29,7 @@ public class CacheManager implements InitializingBean {
 
     public static Map<String, LimitQueue<Long>>  STOCK_PRICE_LIMIT_QUEUE_MAP= new ConcurrentHashMap<>();
 
-
+    public static final Map<String , CommonQuoteDTO> LAST_QUOTE_MAP = new ConcurrentHashMap<>(64);
 
     public void initTradeDate(){
         TradeDatePoolQuery query = new TradeDatePoolQuery();

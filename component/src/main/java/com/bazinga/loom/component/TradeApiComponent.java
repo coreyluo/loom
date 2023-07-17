@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -37,6 +38,8 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
     @Autowired
     private DealOrderInfoComponent dealOrderInfoComponent;
 
+    @Autowired
+    private PositionBalanceComponent positionBalanceComponent;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -91,7 +94,11 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
     }
 
     public void reOrder(ReInsertInfoDTO reInsertInfoDTO){
-
+        try {
+            TimeUnit.MILLISECONDS.sleep(100);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(),e);
+        }
         applicationContext.publishEvent(new InsertOrderEvent(this, reInsertInfoDTO.getStockCode(), reInsertInfoDTO.getOrderPrice(),
                 1L, "", reInsertInfoDTO.getDirection()));
 
@@ -384,6 +391,7 @@ public class TradeApiComponent extends CTORATstpTraderSpi implements Initializin
         {
             log.info("仓位回查接口OnRspQryPosition:{} InvestorID：{} SecurityID：{} HistoryPos：{} TodayBSPos：{} TodayPRPos：{} a:{} b:{}",nRequestID, pPosition.getInvestorID(), pPosition.getSecurityID(),
                     pPosition.getHistoryPos(), pPosition.getTodayBSPos(), pPosition.getTodayPRPos(),pPosition.getAvailablePosition(),pPosition.getCurrentPosition());
+            positionBalanceComponent.justPosition(pPosition.getSecurityID(),pPosition.getCurrentPosition());
         }
 
         if (bIsLast)

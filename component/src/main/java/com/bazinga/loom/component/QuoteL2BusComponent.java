@@ -163,6 +163,7 @@ public class QuoteL2BusComponent {
     }
 
     private void runMarket(CommonQuoteDTO commonQuoteDTO,Date quoteDate) {
+        CacheManager.LAST_QUOTE_MAP.put(commonQuoteDTO.getStockCode(),commonQuoteDTO);
         if(!InsertCacheManager.LOOM_LIST.contains(commonQuoteDTO.getStockCode())){
             return;
         }
@@ -328,23 +329,24 @@ public class QuoteL2BusComponent {
             String dealUniqueKey = UniqueKeyUtil.getDealUniqueKey(commonQuoteDTO.getStockCode(), direction , new Date());
             DealOrderPool dealOrderPool = dealOrderPoolService.getByStockCodeGearTypeDay(dealUniqueKey);
             if (dealOrderPool != null) {
+                orderCancelPools = InsertCacheManager.ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + (-direction));
                 String reverseUniqueKey = UniqueKeyUtil.getDealUniqueKey(commonQuoteDTO.getStockCode(), -direction, new Date());
                 DealOrderPool reverse = dealOrderPoolService.getByStockCodeGearTypeDay(reverseUniqueKey);
                 if (reverse == null) {
-                    log.info("进入是否需要止损判断stockCode{}",commonQuoteDTO.getStockCode());
+                    log.info("进入是否需要止损判断stockCode{} dealDirection{}",commonQuoteDTO.getStockCode(),direction);
                     if (!CollectionUtils.isEmpty(limitQueue)) {
                         Long peek = limitQueue.peek();
                         BigDecimal comparePrice = direction == 1 ? commonQuoteDTO.getBuyOnePrice() : commonQuoteDTO.getSellOnePrice();
                         Long currentVolume = direction == 1 ? commonQuoteDTO.getBuyOneQuantity() : commonQuoteDTO.getSellOneQuantity();
                         if (dealOrderPool.getTradePrice().compareTo(comparePrice) == 0) {
                             if (currentVolume * 5 < Math.abs(peek)) {
-                                log.info("平价止损stockCode{} direction{} level{} 行情{}", commonQuoteDTO.getStockCode(), direction, direction, JSONObject.toJSONString(commonQuoteDTO));
+                                log.info("平价止损stockCode{} direction{} 行情{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO));
                                 ReInsertInfoDTO reInsertInfoDTO = new ReInsertInfoDTO();
-                                reInsertInfoDTO.setDirection(-direction);
+                                reInsertInfoDTO.setDirection(direction);
                                 reInsertInfoDTO.setOrderPrice(comparePrice);
                                 reInsertInfoDTO.setStockCode(commonQuoteDTO.getStockCode());
                                 InsertCacheManager.ORDER_NO_REINSET_MAP.put(orderCancelPools.get(0).getOrderNo(),reInsertInfoDTO);
-                                orderCancelPoolComponent.invokeCancel(orderCancelPools, direction);
+                                orderCancelPoolComponent.invokeCancel(orderCancelPools, -direction);
                                /* if(level==1){
                                     //第2对变1对
                                     for (OrderCancelPool cancelPool : orderCancelPools2) {
@@ -360,11 +362,11 @@ public class QuoteL2BusComponent {
                                     if (currentVolume * 2 < peek) {
                                         log.info("亏钱止损stockCode{} direction{} 行情{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO));
                                         ReInsertInfoDTO reInsertInfoDTO = new ReInsertInfoDTO();
-                                        reInsertInfoDTO.setDirection(-direction);
+                                        reInsertInfoDTO.setDirection(direction);
                                         reInsertInfoDTO.setOrderPrice(commonQuoteDTO.getBuyOnePrice());
                                         reInsertInfoDTO.setStockCode(commonQuoteDTO.getStockCode());
                                         InsertCacheManager.ORDER_NO_REINSET_MAP.put(orderCancelPools.get(0).getOrderNo(),reInsertInfoDTO);
-                                        orderCancelPoolComponent.invokeCancel(orderCancelPools, direction);
+                                        orderCancelPoolComponent.invokeCancel(orderCancelPools, -direction);
                                         //撤卖二直接吃货止损
                                     //    applicationContext.publishEvent(new InsertOrderEvent(this, commonQuoteDTO.getStockCode(), commonQuoteDTO.getBuyOnePrice(), 0L, "", -direction));
                                     }
@@ -374,11 +376,11 @@ public class QuoteL2BusComponent {
                                     if (currentVolume * 2 < Math.abs(peek)) {
                                         log.info("亏钱止损stockCode{} direction{} 行情{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO));
                                         ReInsertInfoDTO reInsertInfoDTO = new ReInsertInfoDTO();
-                                        reInsertInfoDTO.setDirection(-direction);
+                                        reInsertInfoDTO.setDirection(direction);
                                         reInsertInfoDTO.setOrderPrice(commonQuoteDTO.getSellOnePrice());
                                         reInsertInfoDTO.setStockCode(commonQuoteDTO.getStockCode());
                                         InsertCacheManager.ORDER_NO_REINSET_MAP.put(orderCancelPools.get(0).getOrderNo(),reInsertInfoDTO);
-                                        orderCancelPoolComponent.invokeCancel(orderCancelPools, direction);
+                                        orderCancelPoolComponent.invokeCancel(orderCancelPools, -direction);
                                         //撤卖二直接吃货止损
                                      //   applicationContext.publishEvent(new InsertOrderEvent(this, commonQuoteDTO.getStockCode(), commonQuoteDTO.getSellOnePrice(), 0L, "", -direction));
                                     }

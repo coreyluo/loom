@@ -19,6 +19,7 @@
         <task:scheduled ref="overNightJob" method="execute" cron="20 */1 01 * * ?"/>
         <task:scheduled ref="loomFilterJob" method="execute" cron="00 30 23 * * ?"/>
         <task:scheduled ref="retryInitTradeApiJob" method="execute" cron="00 */1 01 * * ?"/>
+        <task:scheduled ref="positionBalanceJob" method="execute" cron="00 56 14 * * ?"/>
 
     </task:scheduled-tasks>
 
