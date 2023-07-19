@@ -96,16 +96,16 @@ public class QuoteL2BusComponent {
             List<OrderCancelPool> orderCancelPools = ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + 1);
             if(!CollectionUtils.isEmpty(orderCancelPools)){
                 log.info("高开过多撤单 不织布stockCode{}",commonQuoteDTO.getStockCode());
-                orderCancelPoolComponent.invokeCancel(orderCancelPools,1);
                 InsertCacheManager.LOOM_LIST.remove(commonQuoteDTO.getStockCode());
+                orderCancelPoolComponent.invokeCancel(orderCancelPools,1);
             }
         }
         if(commonQuoteDTO.getSellOnePrice().add(new BigDecimal("0.02")).compareTo(commonQuoteDTO.getYesterdayPrice())<0){
             List<OrderCancelPool> sellOrderCancelPools = ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + -1);
             if(!CollectionUtils.isEmpty(sellOrderCancelPools)){
                 log.info("低开过多撤单 不织布stockCode{}",commonQuoteDTO.getStockCode());
-                orderCancelPoolComponent.invokeCancel(sellOrderCancelPools,-1);
                 InsertCacheManager.LOOM_LIST.remove(commonQuoteDTO.getStockCode());
+                orderCancelPoolComponent.invokeCancel(sellOrderCancelPools,-1);
             }
         }
 
@@ -342,7 +342,7 @@ public class QuoteL2BusComponent {
                             if (currentVolume * 5 < Math.abs(peek)) {
                                 log.info("平价止损stockCode{} direction{} 行情{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO));
                                 ReInsertInfoDTO reInsertInfoDTO = new ReInsertInfoDTO();
-                                reInsertInfoDTO.setDirection(direction);
+                                reInsertInfoDTO.setDirection(-direction);
                                 reInsertInfoDTO.setOrderPrice(comparePrice);
                                 reInsertInfoDTO.setStockCode(commonQuoteDTO.getStockCode());
                                 InsertCacheManager.ORDER_NO_REINSET_MAP.put(orderCancelPools.get(0).getOrderNo(),reInsertInfoDTO);
@@ -362,7 +362,7 @@ public class QuoteL2BusComponent {
                                     if (currentVolume * 2 < peek) {
                                         log.info("亏钱止损stockCode{} direction{} 行情{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO));
                                         ReInsertInfoDTO reInsertInfoDTO = new ReInsertInfoDTO();
-                                        reInsertInfoDTO.setDirection(direction);
+                                        reInsertInfoDTO.setDirection(-direction);
                                         reInsertInfoDTO.setOrderPrice(commonQuoteDTO.getBuyOnePrice());
                                         reInsertInfoDTO.setStockCode(commonQuoteDTO.getStockCode());
                                         InsertCacheManager.ORDER_NO_REINSET_MAP.put(orderCancelPools.get(0).getOrderNo(),reInsertInfoDTO);
@@ -376,7 +376,7 @@ public class QuoteL2BusComponent {
                                     if (currentVolume * 2 < Math.abs(peek)) {
                                         log.info("亏钱止损stockCode{} direction{} 行情{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO));
                                         ReInsertInfoDTO reInsertInfoDTO = new ReInsertInfoDTO();
-                                        reInsertInfoDTO.setDirection(direction);
+                                        reInsertInfoDTO.setDirection(-direction);
                                         reInsertInfoDTO.setOrderPrice(commonQuoteDTO.getSellOnePrice());
                                         reInsertInfoDTO.setStockCode(commonQuoteDTO.getStockCode());
                                         InsertCacheManager.ORDER_NO_REINSET_MAP.put(orderCancelPools.get(0).getOrderNo(),reInsertInfoDTO);

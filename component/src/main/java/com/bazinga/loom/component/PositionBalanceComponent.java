@@ -55,16 +55,15 @@ public class PositionBalanceComponent {
                 tradeApiComponent.insertOrder(orderRequestDTO);
             }
         }else {
-            BigDecimal position = InsertCacheManager.TRADE_ACCOUNT.getPosition();
             OrderRequestDTO orderRequestDTO = new OrderRequestDTO();
             orderRequestDTO.setExchangeId(ExchangeIdUtil.getExchangeId(stockCode));
             orderRequestDTO.setStockCode(stockCode);
             orderRequestDTO.setShareholderId(shareHolderId);
             orderRequestDTO.setLocalSign(InsertCacheManager.getOrderRef());
             log.info("首次补齐仓位stockCode{}",stockCode);
-            orderRequestDTO.setOrderPrice(commonQuoteDTO.getSellOnePrice());
-            orderRequestDTO.setVolume(position.intValue());
-            tradeApiComponent.insertOrder(orderRequestDTO);
+            orderRequestDTO.setOrderPrice(commonQuoteDTO.getBuyOnePrice());
+            orderRequestDTO.setVolume(currentPosition);
+            tradeApiComponent.sellOrder(orderRequestDTO);
         }
 
     }

@@ -59,7 +59,7 @@ public class LoomFilterComponent {
                 continue;
             }
             StockKbar lastStockKbar = stockKbars.get(0);
-            if(lastStockKbar.getClosePrice().compareTo( CommonConstant.DECIMAL_TWO) >= 0){
+            if(lastStockKbar.getClosePrice().compareTo(new BigDecimal("2.5")) >= 0){
                 continue;
             }
             BigDecimal sumTotalAmount = stockKbars.stream().map(StockKbar::getTradeAmount).reduce(BigDecimal::add).get();
