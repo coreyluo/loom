@@ -338,9 +338,10 @@ public class QuoteL2BusComponent {
                         Long peek = limitQueue.peek();
                         BigDecimal comparePrice = direction == 1 ? commonQuoteDTO.getBuyOnePrice() : commonQuoteDTO.getSellOnePrice();
                         Long currentVolume = direction == 1 ? commonQuoteDTO.getBuyOneQuantity() : commonQuoteDTO.getSellOneQuantity();
+                        peek = direction==1? peek:Math.abs(peek);
                         if (dealOrderPool.getTradePrice().compareTo(comparePrice) == 0) {
-                            if (currentVolume * 5 < Math.abs(peek)) {
-                                log.info("平价止损stockCode{} direction{} 行情{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO));
+                            if (currentVolume * 5 < peek) {
+                                log.info("平价止损stockCode{} direction{} 行情{} 最大值{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO),peek);
                                 ReInsertInfoDTO reInsertInfoDTO = new ReInsertInfoDTO();
                                 reInsertInfoDTO.setDirection(-direction);
                                 reInsertInfoDTO.setOrderPrice(comparePrice);
@@ -373,7 +374,7 @@ public class QuoteL2BusComponent {
                                 }
                             }else {
                                 if (dealOrderPool.getTradePrice().compareTo(commonQuoteDTO.getSellOnePrice()) < 0) {
-                                    if (currentVolume * 2 < Math.abs(peek)) {
+                                    if (currentVolume * 2 < peek) {
                                         log.info("亏钱止损stockCode{} direction{} 行情{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO));
                                         ReInsertInfoDTO reInsertInfoDTO = new ReInsertInfoDTO();
                                         reInsertInfoDTO.setDirection(-direction);
