@@ -338,7 +338,7 @@ public class QuoteL2BusComponent {
                         Long peek = limitQueue.peek();
                         BigDecimal comparePrice = direction == 1 ? commonQuoteDTO.getBuyOnePrice() : commonQuoteDTO.getSellOnePrice();
                         Long currentVolume = direction == 1 ? commonQuoteDTO.getBuyOneQuantity() : commonQuoteDTO.getSellOneQuantity();
-                        peek = direction==1? peek:Math.abs(peek);
+                        peek = getMaxValue(direction,limitQueue);
                         if (dealOrderPool.getTradePrice().compareTo(comparePrice) == 0) {
                             if (currentVolume * 5 < peek) {
                                 log.info("平价止损stockCode{} direction{} 行情{} 最大值{}", commonQuoteDTO.getStockCode(), direction, JSONObject.toJSONString(commonQuoteDTO),peek);
@@ -395,5 +395,14 @@ public class QuoteL2BusComponent {
             }
         }
 
+    private Long getMaxValue(int direction, LimitQueue<Long> limitQueue) {
+        if(direction==1){
+            return limitQueue.stream().mapToLong(Long::longValue).max().getAsLong();
+        }else {
+            return limitQueue.stream().mapToLong(Long::longValue).min().getAsLong();
 
+        }
     }
+
+
+}

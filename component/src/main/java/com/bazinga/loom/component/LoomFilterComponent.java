@@ -16,6 +16,7 @@ import com.bazinga.loom.service.CirculateInfoService;
 import com.bazinga.loom.service.LoomStockPoolService;
 import com.bazinga.loom.service.StockKbarService;
 import com.bazinga.loom.service.StockOpenSnapshotService;
+import com.bazinga.loom.util.StockKbarUtil;
 import com.bazinga.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +54,27 @@ public class LoomFilterComponent {
             StockKbarQuery query = new StockKbarQuery();
             query.setStockCode(circulateInfo.getStockCode());
             query.addOrderBy("kbar_date", Sort.SortType.DESC);
-            query.setLimit(5);
+            query.setLimit(11);
             List<StockKbar> stockKbars = stockKbarService.listByCondition(query);
-            if(CollectionUtils.isEmpty(stockKbars) || stockKbars.size()<5){
+            if(CollectionUtils.isEmpty(stockKbars) || stockKbars.size()<11){
                 continue;
             }
             StockKbar lastStockKbar = stockKbars.get(0);
+            StockKbar preStockKbar = stockKbars.get(1);
+            boolean upperFlag = false;
+            for (int i = 0; i<10; i++) {
+                StockKbar current = stockKbars.get(i);
+                StockKbar pre = stockKbars.get(i+1);
+                if(StockKbarUtil.isUpperPrice(current,pre)){
+                    log.info("触发涨停不进入织布池stockCode{}",lastStockKbar.getStockCode());
+                    upperFlag =true;
+                    break;
+                }
+            }
+            if(upperFlag){
+                log.info("最近10个交易日有涨停stockCode{}",upperFlag);
+                continue;
+            }
             if(lastStockKbar.getClosePrice().compareTo(new BigDecimal("2.5")) >= 0){
                 continue;
             }

@@ -66,7 +66,7 @@ public class OverNightOrderComponent {
                 || byUniqueKey.getAsk2Price() == null ){
                 continue;
             }
-            if(byUniqueKey.getBid1Volume() < (byUniqueKey.getBid1Volume()+ byUniqueKey.getBid2Volume())/20){
+            if(byUniqueKey.getBid1Volume() < (byUniqueKey.getBid1Volume()+ byUniqueKey.getBid2Volume())/5){
                 log.info("单子薄不挂往下顺延 stockCode{}",byUniqueKey.getStockCode());
                 applicationContext.publishEvent(new InsertOrderEvent(this,loomStockPool.getStockCode(),byUniqueKey.getBid2Price(),0L,"",1));
                /* if(byUniqueKey.getBid3Price() != null){
@@ -76,7 +76,7 @@ public class OverNightOrderComponent {
                 applicationContext.publishEvent(new InsertOrderEvent(this,loomStockPool.getStockCode(),byUniqueKey.getBid1Price(),0L,"",1));
             }
 
-            if(byUniqueKey.getAsk1Volume() < (byUniqueKey.getAsk1Volume()+ byUniqueKey.getAsk2Volume())/20){
+            if(byUniqueKey.getAsk1Volume() < (byUniqueKey.getAsk1Volume()+ byUniqueKey.getAsk2Volume())/5){
                 log.info("单子薄不挂往下顺延 stockCode{}",byUniqueKey.getStockCode());
                 applicationContext.publishEvent(new InsertOrderEvent(this,loomStockPool.getStockCode(),byUniqueKey.getAsk2Price(),0L,"",-1));
               /*  if(byUniqueKey.getAsk3Price() != null){
