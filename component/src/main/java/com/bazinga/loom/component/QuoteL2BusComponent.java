@@ -399,7 +399,7 @@ public class QuoteL2BusComponent {
         if(direction==1){
             return limitQueue.stream().mapToLong(Long::longValue).max().getAsLong();
         }else {
-            return limitQueue.stream().mapToLong(Long::longValue).min().getAsLong();
+            return -limitQueue.stream().mapToLong(Long::longValue).min().getAsLong();
 
         }
     }
