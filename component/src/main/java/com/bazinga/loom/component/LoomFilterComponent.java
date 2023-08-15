@@ -18,6 +18,7 @@ import com.bazinga.loom.service.StockKbarService;
 import com.bazinga.loom.service.StockOpenSnapshotService;
 import com.bazinga.loom.util.StockKbarUtil;
 import com.bazinga.util.DateUtil;
+import com.bazinga.util.PriceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -65,10 +66,19 @@ public class LoomFilterComponent {
             for (int i = 0; i<10; i++) {
                 StockKbar current = stockKbars.get(i);
                 StockKbar pre = stockKbars.get(i+1);
-                if(StockKbarUtil.isUpperPrice(current,pre)){
-                    log.info("触发涨停不进入织布池stockCode{}",lastStockKbar.getStockCode());
-                    upperFlag =true;
-                    break;
+                if(current.getStockCode().startsWith("3")){
+                    BigDecimal rate = PriceUtil.getPricePercentRate(current.getHighPrice().subtract(pre.getClosePrice()), current.getClosePrice());
+                    if(rate.compareTo(new BigDecimal("10"))>0){
+                        log.info("触发大于10个点不进入织布池stockCode{}",lastStockKbar.getStockCode());
+                        upperFlag =true;
+                        break;
+                    }
+                }else {
+                    if(PriceUtil.isUpperPrice(current.getStockCode(),current.getHighPrice().subtract(pre.getClosePrice()),pre.getClosePrice())){
+                        log.info("触发涨停不进入织布池stockCode{}",lastStockKbar.getStockCode());
+                        upperFlag =true;
+                        break;
+                    }
                 }
             }
             if(upperFlag){

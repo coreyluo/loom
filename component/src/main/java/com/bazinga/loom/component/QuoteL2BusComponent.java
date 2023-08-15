@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.bazinga.loom.cache.CacheManager.STOCK_PRICE_LIMIT_QUEUE_MAP;
+import static com.bazinga.loom.cache.InsertCacheManager.LOOM_LIST;
 import static com.bazinga.loom.cache.InsertCacheManager.ORDER_CANCEL_POOL_MAP;
 
 @Component
@@ -54,6 +55,8 @@ public class QuoteL2BusComponent {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    private static final Long WAN_SHOU = 1000000L;
 
     public void dealWithQuote(CommonQuoteDTO commonQuoteDTO) {
         try {
@@ -123,7 +126,7 @@ public class QuoteL2BusComponent {
         if(!InsertCacheManager.LOOM_LIST.contains(commonQuoteDTO.getStockCode())){
             return;
         }
-        Long unaviliable = commonQuoteDTO.getBuyTwoQuantity() == null ? commonQuoteDTO.getSellTwoQuantity() : commonQuoteDTO.getBuyTwoQuantity();
+        noWave(commonQuoteDTO);
         Long avgQuantity = snapshotComponent.getAvgQuantity(commonQuoteDTO.getStockCode());
         //匹配量异常放量 撤当前价单子
         if (commonQuoteDTO.getBuyOneQuantity() > 3 * avgQuantity) {
@@ -159,6 +162,28 @@ public class QuoteL2BusComponent {
                 orderCancelPoolComponent.invokeCancel(sellOrderCancelPools, -1);
             }
         }
+
+    }
+
+    private void noWave(CommonQuoteDTO commonQuoteDTO) {
+        if(commonQuoteDTO.getBuyOneQuantity()!=null&& commonQuoteDTO.getBuyTwoQuantity()!=null
+            && commonQuoteDTO.getSellOneQuantity()!=null && commonQuoteDTO.getSellTwoQuantity()!=null){
+            if(commonQuoteDTO.getBuyOneQuantity()<WAN_SHOU && commonQuoteDTO.getBuyTwoQuantity()<WAN_SHOU
+                && commonQuoteDTO.getSellOneQuantity() <WAN_SHOU && commonQuoteDTO.getSellTwoQuantity() < WAN_SHOU){
+                log.info("满足集合开出来同时小于万手 stockCode{}",commonQuoteDTO.getStockCode());
+                List<OrderCancelPool> buyOrderCancelPools = ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + 1);
+                List<OrderCancelPool> sellOrderCancelPools = ORDER_CANCEL_POOL_MAP.get(commonQuoteDTO.getStockCode() + -1);
+                if(!CollectionUtils.isEmpty(buyOrderCancelPools)){
+                    orderCancelPoolComponent.invokeCancel(buyOrderCancelPools, 1);
+                }
+                if(CollectionUtils.isEmpty(sellOrderCancelPools)){
+                    orderCancelPoolComponent.invokeCancel(sellOrderCancelPools, -1);
+                }
+                LOOM_LIST.remove(commonQuoteDTO.getStockCode());
+                log.info("移除织布池 stockCode{}",commonQuoteDTO.getStockCode());
+            }
+        }
+
 
     }
 
