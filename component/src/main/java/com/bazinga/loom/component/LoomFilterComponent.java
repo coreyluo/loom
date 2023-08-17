@@ -65,6 +65,11 @@ public class LoomFilterComponent {
             boolean upperFlag = false;
             for (int i = 0; i<10; i++) {
                 StockKbar current = stockKbars.get(i);
+                /*if(current.getTradeAmount().compareTo(new BigDecimal("100000000"))>0){
+                    upperFlag =true;
+                    log.info("成交金额大于1个亿stockCode{}",current.getStockCode());
+                    break;
+                }*/
                 StockKbar pre = stockKbars.get(i+1);
                 if(current.getStockCode().startsWith("3")){
                     BigDecimal rate = PriceUtil.getPricePercentRate(current.getHighPrice().subtract(pre.getClosePrice()), current.getClosePrice());
@@ -74,7 +79,7 @@ public class LoomFilterComponent {
                         break;
                     }
                 }else {
-                    if(PriceUtil.isUpperPrice(current.getStockCode(),current.getHighPrice().subtract(pre.getClosePrice()),pre.getClosePrice())){
+                    if(PriceUtil.isUpperPrice(current.getStockCode(),current.getHighPrice(),pre.getClosePrice())){
                         log.info("触发涨停不进入织布池stockCode{}",lastStockKbar.getStockCode());
                         upperFlag =true;
                         break;

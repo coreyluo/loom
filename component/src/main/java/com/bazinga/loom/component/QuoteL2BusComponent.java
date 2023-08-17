@@ -56,7 +56,7 @@ public class QuoteL2BusComponent {
     @Autowired
     private ApplicationContext applicationContext;
 
-    private static final Long WAN_SHOU = 1000000L;
+    private static final Long WAN_SHOU = 500000L;
 
     public void dealWithQuote(CommonQuoteDTO commonQuoteDTO) {
         try {
@@ -111,7 +111,7 @@ public class QuoteL2BusComponent {
                 orderCancelPoolComponent.invokeCancel(sellOrderCancelPools,-1);
             }
         }
-
+        noWave(commonQuoteDTO);
     }
 
     //集合逻辑处理
@@ -126,7 +126,6 @@ public class QuoteL2BusComponent {
         if(!InsertCacheManager.LOOM_LIST.contains(commonQuoteDTO.getStockCode())){
             return;
         }
-        noWave(commonQuoteDTO);
         Long avgQuantity = snapshotComponent.getAvgQuantity(commonQuoteDTO.getStockCode());
         //匹配量异常放量 撤当前价单子
         if (commonQuoteDTO.getBuyOneQuantity() > 3 * avgQuantity) {
@@ -176,7 +175,7 @@ public class QuoteL2BusComponent {
                 if(!CollectionUtils.isEmpty(buyOrderCancelPools)){
                     orderCancelPoolComponent.invokeCancel(buyOrderCancelPools, 1);
                 }
-                if(CollectionUtils.isEmpty(sellOrderCancelPools)){
+                if(!CollectionUtils.isEmpty(sellOrderCancelPools)){
                     orderCancelPoolComponent.invokeCancel(sellOrderCancelPools, -1);
                 }
                 LOOM_LIST.remove(commonQuoteDTO.getStockCode());
