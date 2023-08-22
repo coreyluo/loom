@@ -165,6 +165,9 @@ public class QuoteL2BusComponent {
     }
 
     private void noWave(CommonQuoteDTO commonQuoteDTO) {
+        if(!LOOM_LIST.contains(commonQuoteDTO.getStockCode())){
+            return;
+        }
         if(commonQuoteDTO.getBuyOneQuantity()!=null&& commonQuoteDTO.getBuyTwoQuantity()!=null
             && commonQuoteDTO.getSellOneQuantity()!=null && commonQuoteDTO.getSellTwoQuantity()!=null){
             if(commonQuoteDTO.getBuyOneQuantity()<WAN_SHOU && commonQuoteDTO.getBuyTwoQuantity()<WAN_SHOU
