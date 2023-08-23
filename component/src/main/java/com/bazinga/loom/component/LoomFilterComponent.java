@@ -85,6 +85,13 @@ public class LoomFilterComponent {
                         break;
                     }
                 }
+                BigDecimal ma5 = stockKbars.subList(0, 5).stream().map(StockKbar::getAdjClosePrice).reduce(BigDecimal::add).get().divide(new BigDecimal("5"), 2, RoundingMode.HALF_UP);
+                BigDecimal preMa5 = stockKbars.subList(1, 6).stream().map(StockKbar::getAdjClosePrice).reduce(BigDecimal::add).get().divide(new BigDecimal("5"), 2, RoundingMode.HALF_UP);
+                if(ma5.compareTo(preMa5)<0){
+                    log.info("ma5条件不满足不进入织布池stockCode{}",lastStockKbar.getStockCode());
+                    upperFlag =true;
+                    break;
+                }
             }
             if(upperFlag){
                 log.info("最近10个交易日有涨停stockCode{}",upperFlag);
